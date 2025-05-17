@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <style>
+        .primary { fill: #1A3C34; }
+        .secondary { fill: #E3B505; }
+    </style>
+    <circle class="secondary" cx="50" cy="50" r="45" opacity="0.1"/>
+    <g class="primary">
+        <path d="M50 20L25 35v40h50V35L50 20z"/>
+        <path d="M40 45h20v30H40z"/>
+        <path d="M45 55h10v20H45z"/>
+        <path d="M35 30c0-5.5 6.7-10 15-10s15 4.5 15 10H35z"/>
+    </g>
+</svg> 

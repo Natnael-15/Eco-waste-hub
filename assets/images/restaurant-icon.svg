@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <style>
+        .primary { fill: #1A3C34; }
+        .secondary { fill: #E3B505; }
+    </style>
+    <circle class="secondary" cx="50" cy="50" r="45" opacity="0.1"/>
+    <g class="primary">
+        <path d="M30 25v50h8V60h24v15h8V25H30zm32 27H38V33h24v19z"/>
+        <path d="M42 37h16v11H42z"/>
+        <circle cx="50" cy="50" r="3"/>
+    </g>
+</svg> 
