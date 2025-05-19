@@ -1,7 +1,8 @@
 /** @jsxImportSource react */
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import type { ReactNode } from 'react';
 import { supabase } from '../services/supabase';
-import { User, Session } from '@supabase/supabase-js';
+import type { User } from '@supabase/supabase-js';
 import WelcomeModal from '../components/WelcomeModal';
 
 interface Profile {
@@ -29,7 +30,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [connectionStatus, setConnectionStatus] = useState<'checking' | 'connected' | 'error'>('checking');
   const [showWelcome, setShowWelcome] = useState(false);
   const [lastConnectionTest, setLastConnectionTest] = useState<number>(0);
   const CONNECTION_TEST_INTERVAL = 5000;
