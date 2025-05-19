@@ -5,15 +5,6 @@ import path from 'path';
 export default defineConfig({
   plugins: [react()],
   base: '/',
-  server: {
-    port: 5173,
-    host: true,
-    strictPort: true,
-    open: true,
-    hmr: {
-      overlay: true
-    }
-  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src')
@@ -23,6 +14,7 @@ export default defineConfig({
     sourcemap: true,
     outDir: 'dist',
     assetsDir: 'assets',
+    minify: 'terser',
     rollupOptions: {
       output: {
         manualChunks: {
