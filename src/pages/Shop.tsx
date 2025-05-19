@@ -105,14 +105,17 @@ const Shop = () => {
       .then(data => {
         console.log('[Shop] Direct fetch data:', data);
         // Normalize data types
-        const normalized = (data || []).map(product => ({
-          ...product,
-          price: product.price ? Number(product.price) : 0,
-          rating: product.rating ? Number(product.rating) : 0,
-          discountPercent: product.discount_percent !== undefined ? Number(product.discount_percent) : null,
-          originalPrice: product.original_price !== undefined ? Number(product.original_price) : null,
-          tags: Array.isArray(product.tags) ? product.tags : [],
-        }));
+        const normalized = (data || []).map(product => {
+          const basePrice = product.price ? Number(product.price) : 0;
+          return {
+            ...product,
+            price: basePrice,
+            rating: product.rating ? Number(product.rating) : 0,
+            discountPercent: product.discount_percent !== undefined ? Number(product.discount_percent) : null,
+            originalPrice: product.original_price !== undefined ? Number(product.original_price) : basePrice,
+            tags: Array.isArray(product.tags) ? product.tags : [],
+          };
+        });
         console.log('[Shop] Normalized products:', normalized);
         setProducts(normalized);
         setLoading(false);
