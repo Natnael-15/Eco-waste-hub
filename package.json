@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npx --no-install tsc && vite build",
+    "build": "node --require typescript/register ./node_modules/typescript/lib/tsc.js && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
