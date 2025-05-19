@@ -26,6 +26,7 @@ import Account from './pages/Account';
 import AdminLogin from './pages/AdminLogin';
 import AdminOrders from './pages/AdminOrders';
 import AdminDonations from './pages/AdminDonations';
+import Presentation from './pages/Presentation';
 import './App.css';
 import { supabase } from './services/supabase';
 
@@ -58,6 +59,7 @@ const AppRoutes: React.FC<{ darkMode: boolean, toggleDarkMode: () => void }> = (
           <Route path="/admin-login" element={<AdminLogin />} />
           <Route path="/admin/orders" element={<AdminOrders />} />
           <Route path="/admin/donations" element={<AdminDonations />} />
+          <Route path="/presentation" element={<Presentation />} />
           <Route path="*" element={
             <div className="flex items-center justify-center min-h-[60vh]">
               <div className="text-center">
