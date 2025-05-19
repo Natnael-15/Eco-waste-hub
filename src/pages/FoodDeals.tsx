@@ -45,14 +45,17 @@ const FoodDeals: React.FC = () => {
       .then(res => res.json())
       .then(data => {
         // Normalize data types
-        const normalized = (data || []).map(product => ({
-          ...product,
-          price: product.price ? Number(product.price) * 0.7 : 0,
-          originalPrice: product.price ? Number(product.price) : 0,
-          rating: product.rating ? Number(product.rating) : 0,
-          discountPercent: 30,
-          tags: Array.isArray(product.tags) ? product.tags : [],
-        }));
+        const normalized = (data || []).map(product => {
+          const basePrice = product.price ? Number(product.price) : 0;
+          return {
+            ...product,
+            originalPrice: basePrice,
+            price: basePrice * 0.7,
+            rating: product.rating ? Number(product.rating) : 0,
+            discountPercent: 30,
+            tags: Array.isArray(product.tags) ? product.tags : [],
+          };
+        });
         setDeals(normalized);
         setLoadingDeals(false);
       })
