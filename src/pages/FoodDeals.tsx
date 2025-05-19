@@ -49,10 +49,10 @@ const FoodDeals: React.FC = () => {
           const basePrice = product.price ? Number(product.price) : 0;
           return {
             ...product,
-            originalPrice: basePrice,
             price: basePrice * 0.7,
             rating: product.rating ? Number(product.rating) : 0,
             discountPercent: 30,
+            originalPrice: basePrice,
             tags: Array.isArray(product.tags) ? product.tags : [],
           };
         });
