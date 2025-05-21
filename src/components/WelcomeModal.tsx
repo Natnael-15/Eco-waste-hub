@@ -1,88 +1,101 @@
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 interface WelcomeModalProps {
   isOpen: boolean;
+  onClose: () => void;
   userEmail: string;
 }
 
-const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, userEmail }) => {
+const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onClose, userEmail }) => {
+  if (!isOpen) return null;
+
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          initial={{ opacity: 0, y: -50, scale: 0.8 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 50, scale: 0.8 }}
-          transition={{ duration: 0.5, ease: "easeInOut" }}
-          className="fixed inset-0 flex items-center justify-center z-50"
-        >
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm"
-          />
-          <motion.div
-            className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-2xl max-w-sm w-full mx-4 relative overflow-hidden"
-            initial={{ rotate: 5 }}
-            animate={{ rotate: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <motion.div
-              className="absolute -top-10 -right-10 w-40 h-40 bg-eco-yellow/20 rounded-full"
-              animate={{ scale: [1, 1.2, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            />
-            <motion.div
-              className="absolute -bottom-10 -left-10 w-40 h-40 bg-eco-green/20 rounded-full"
-              animate={{ scale: [1, 1.2, 1] }}
-              transition={{ duration: 2, repeat: Infinity, delay: 1 }}
-            />
-            <div className="relative z-10 text-center">
-              <motion.h2
-                className="text-3xl font-bold text-eco-green dark:text-eco-yellow mb-4"
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.2 }}
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="fixed inset-0 bg-black opacity-50" onClick={onClose}></div>
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.9, opacity: 0 }}
+        className="relative bg-white dark:bg-gray-800 rounded-lg p-8 max-w-md w-full mx-4"
+      >
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+          Welcome to Eco Waste Hub!
+        </h2>
+        <p className="text-gray-600 dark:text-gray-300 mb-6">
+          We&apos;re excited to have you join our community of eco-conscious individuals.
+          Together, we can make a difference in reducing waste and promoting sustainability.
+        </p>
+        <div className="space-y-4">
+          <div className="flex items-start">
+            <div className="flex-shrink-0">
+              <svg
+                className="h-6 w-6 text-green-500"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
               >
-                Welcome Back!
-              </motion.h2>
-              <motion.p
-                className="text-gray-600 dark:text-gray-300 mb-6"
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.3 }}
-              >
-                Great to see you again, {userEmail?.split('@')[0]}! Let's continue making the world a better place together.
-              </motion.p>
-              <motion.div
-                className="flex justify-center"
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.4 }}
-              >
-                <div className="w-16 h-16 bg-eco-yellow/20 rounded-full flex items-center justify-center">
-                  <motion.div
-                    animate={{ 
-                      scale: [1, 1.2, 1],
-                      rotate: [0, 10, -10, 0]
-                    }}
-                    transition={{ 
-                      duration: 2,
-                      repeat: Infinity,
-                      ease: "easeInOut"
-                    }}
-                  >
-                    🌱
-                  </motion.div>
-                </div>
-              </motion.div>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
             </div>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+            <p className="ml-3 text-gray-600 dark:text-gray-300">
+              Browse our selection of eco-friendly products
+            </p>
+          </div>
+          <div className="flex items-start">
+            <div className="flex-shrink-0">
+              <svg
+                className="h-6 w-6 text-green-500"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+            </div>
+            <p className="ml-3 text-gray-600 dark:text-gray-300">
+              Find great deals on surplus food items
+            </p>
+          </div>
+          <div className="flex items-start">
+            <div className="flex-shrink-0">
+              <svg
+                className="h-6 w-6 text-green-500"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+            </div>
+            <p className="ml-3 text-gray-600 dark:text-gray-300">
+              Track your environmental impact
+            </p>
+          </div>
+        </div>
+        <button
+          onClick={onClose}
+          className="mt-6 w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+        >
+          Get Started
+        </button>
+      </motion.div>
+    </div>
   );
 };
 

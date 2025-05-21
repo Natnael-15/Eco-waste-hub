@@ -5,6 +5,8 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import userIcon from '/assets/user-icon.svg';
 import { useAuth } from '../context/AuthContext';
+import { motion } from 'framer-motion';
+import Navbar from '../components/Navbar';
 
 const socialProof = [
   { name: 'Sarah', type: 'Volunteer', img: userIcon },
@@ -272,32 +274,117 @@ const EcoTip: React.FC = () => {
   );
 };
 
-const Home: React.FC = () => {
-  const { user } = useAuth();
+// Social Proof Bar with animation and tooltips
+const SocialProofBar: React.FC = () => {
+  const [offset, setOffset] = useState(0);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  // Duplicate the list for seamless looping
+  const items = [...socialProof, ...socialProof];
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setOffset(prev => {
+        const width = scrollRef.current?.scrollWidth || 0;
+        const containerWidth = scrollRef.current?.offsetWidth || 1;
+        // Reset when scrolled past half (since we doubled the list)
+        if (prev >= width / 2) return 0;
+        return prev + 1;
+      });
+    }, 16); // ~60fps
+    return () => clearInterval(interval);
+  }, []);
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
-      {/* Social Proof Bar */}
-      <div className="w-full bg-white/80 dark:bg-gray-800 border-b border-eco-green/10 dark:border-gray-700 py-2 flex items-center justify-center gap-4 overflow-x-auto animate-fade-in">
-        <span className="text-eco-green dark:text-eco-yellow font-semibold text-sm mr-2">Just joined:</span>
-        {socialProof.map((p, i) => (
-          <div key={i} className="flex flex-col items-center mx-2">
-            <img src={p.img} alt={p.name} className="w-8 h-8 rounded-full border-2 border-eco-yellow object-cover" />
-            <span className="text-xs text-eco-green dark:text-eco-yellow font-bold mt-1">{p.name}</span>
+    <div className="fixed top-0 left-0 w-screen z-30 bg-transparent overflow-x-hidden" style={{ height: 56 }}>
+      {/* Animated gradient background */}
+      <div className="absolute inset-0 z-0 bg-gradient-to-r from-eco-green/80 via-eco-yellow/20 to-eco-green/80 animate-gradient-x" />
+      <div
+        ref={scrollRef}
+        className="flex items-center gap-8 h-14 relative z-10 whitespace-nowrap"
+        style={{
+          transform: `translateX(-${offset}px)`,
+          transition: 'transform 0.1s linear',
+          willChange: 'transform',
+        }}
+      >
+        <span className="text-eco-green dark:text-eco-yellow font-semibold text-sm mr-2 whitespace-nowrap">Just joined:</span>
+        {items.map((p, i) => (
+          <div
+            key={i}
+            className="flex flex-col items-center mx-2 group cursor-pointer transition-transform duration-300 hover:scale-110"
+          >
+            <div className="relative">
+              <img
+                src={p.img}
+                alt={p.name}
+                className="w-8 h-8 rounded-full border-2 border-eco-yellow object-cover shadow-lg animate-pulse group-hover:animate-none"
+                style={{ animationDelay: `${(i % socialProof.length) * 0.2}s` }}
+              />
+              {/* Tooltip */}
+              <div className="absolute left-1/2 -translate-x-1/2 top-10 bg-gray-900 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-20 shadow-lg">
+                {p.name} <span className="text-eco-yellow">– {p.type}</span>
+              </div>
+            </div>
+            <span className="text-xs text-eco-green dark:text-eco-yellow font-bold mt-1 animate-fade-in" style={{ animationDelay: `${(i % socialProof.length) * 0.2}s` }}>{p.name}</span>
           </div>
         ))}
       </div>
+    </div>
+  );
+};
+
+interface HomeProps {
+  darkMode: boolean;
+  toggleDarkMode: () => void;
+}
+
+const Home: React.FC<HomeProps> = ({ darkMode, toggleDarkMode }) => {
+  const { user } = useAuth();
+  return (
+    <>
+      <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300 pt-20">
+        {/* Social Proof Bar */}
+        <SocialProofBar />
       {/* Hero Section with Gallery Image */}
       <section className="relative min-h-[60vh] flex items-center justify-center bg-gradient-to-br from-eco-green via-eco-green/80 to-eco-green/60 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
         <div className="absolute inset-0 bg-[url('/assets/gallery1.jpeg')] bg-cover bg-center opacity-40 mix-blend-multiply"></div>
         {/* Animated Eco Particles */}
         <EcoParticles />
         <div className="relative z-10 max-w-2xl mx-auto text-center py-20 px-4">
-          <h1 className="text-5xl md:text-6xl font-bold font-playfair text-white mb-6 drop-shadow-lg">Rescue Food. Feed Communities.</h1>
-          <p className="text-xl md:text-2xl text-white/90 mb-8 font-medium drop-shadow">Join Eco Waste Hub to save surplus food and make a real difference in your community.</p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/shop" className="bg-eco-yellow text-eco-green font-bold px-8 py-3 rounded-full shadow hover:bg-yellow-300 transition animate-pulse">Shop Now</Link>
-            <Link to="/donate" className="bg-white/80 dark:bg-gray-800 text-eco-green font-bold px-8 py-3 rounded-full shadow hover:bg-white dark:hover:bg-gray-700 transition border border-eco-green">Donate</Link>
-          </div>
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="text-5xl md:text-6xl font-bold font-playfair text-white mb-6 drop-shadow-lg"
+          >
+            Reduce Waste, Save Money
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="text-xl md:text-2xl text-white/90 mb-8 font-medium drop-shadow"
+          >
+            Join our community of eco-conscious individuals and businesses working together to reduce food waste and promote sustainability.
+          </motion.p>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="flex flex-col sm:flex-row gap-4 justify-center"
+          >
+            <Link
+              to="/shop"
+              className="bg-eco-yellow text-eco-green font-bold px-8 py-3 rounded-full shadow hover:bg-yellow-300 transition animate-pulse"
+            >
+              Shop Now
+            </Link>
+            <Link
+              to="/about"
+              className="bg-white/80 dark:bg-gray-800 text-eco-green font-bold px-8 py-3 rounded-full shadow hover:bg-white dark:hover:bg-gray-700 transition border border-eco-green"
+            >
+              Learn More
+            </Link>
+          </motion.div>
         </div>
       </section>
 
@@ -431,6 +518,7 @@ const Home: React.FC = () => {
         </div>
       </section>
     </div>
+    </>
   );
 };
 

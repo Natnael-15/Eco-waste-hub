@@ -4,7 +4,8 @@
     "composite": false,
     "declaration": false,
     "sourceMap": true,
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "noEmit": true
   },
   "include": ["src"]
 } 

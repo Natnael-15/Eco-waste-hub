@@ -2,9 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import { FaSearch, FaHeart, FaShoppingCart, FaStar, FaTag, FaLeaf, FaAppleAlt, FaFish, FaCarrot, FaFire, FaStore, FaTruck, FaRecycle, FaUsers, FaBolt, FaMinus, FaPlus, FaTrash } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import demoProducts from '../data/demoProducts';
-import { supabase, supabaseUrl, supabaseAnonKey } from '../services/supabase';
+import { supabase, supabaseUrl, supabaseAnonKey } from '../lib/supabase';
 import CartModal from '../components/CartModal';
 import { useCart } from '../context/CartContext';
+import Navbar from '../components/Navbar';
 
 const categories = [
   { name: 'All', icon: <FaStore className="text-eco-green" /> },
@@ -65,7 +66,12 @@ function getStars(rating) {
   return stars;
 }
 
-const Shop = () => {
+interface ShopProps {
+  darkMode: boolean;
+  toggleDarkMode: () => void;
+}
+
+const Shop: React.FC<ShopProps> = ({ darkMode, toggleDarkMode }) => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedTag, setSelectedTag] = useState('');
   const [search, setSearch] = useState('');
@@ -105,17 +111,14 @@ const Shop = () => {
       .then(data => {
         console.log('[Shop] Direct fetch data:', data);
         // Normalize data types
-        const normalized = (data || []).map(product => {
-          const basePrice = product.price ? Number(product.price) : 0;
-          return {
-            ...product,
-            price: basePrice,
-            rating: product.rating ? Number(product.rating) : 0,
-            discountPercent: product.discount_percent !== undefined ? Number(product.discount_percent) : null,
-            originalPrice: product.original_price !== undefined ? Number(product.original_price) : basePrice,
-            tags: Array.isArray(product.tags) ? product.tags : [],
-          };
-        });
+        const normalized = (data || []).map(product => ({
+          ...product,
+          price: product.price ? Number(product.price) : 0,
+          rating: product.rating ? Number(product.rating) : 0,
+          discountPercent: product.discount_percent !== undefined ? Number(product.discount_percent) : null,
+          originalPrice: product.original_price !== undefined ? Number(product.original_price) : null,
+          tags: Array.isArray(product.tags) ? product.tags : [],
+        }));
         console.log('[Shop] Normalized products:', normalized);
         setProducts(normalized);
         setLoading(false);
@@ -232,6 +235,8 @@ const Shop = () => {
   console.log('[Shop] Filtered products before render:', filteredProducts);
 
   return (
+    <>
+      <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-amber-50 to-emerald-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 transition-colors duration-300 pb-20">
       {/* Floating Checkout Icon */}
       {cart.length > 0 && (
@@ -267,6 +272,7 @@ const Shop = () => {
             </button>
             <button
               className="bg-white border-2 border-eco-green text-eco-green px-6 py-3 rounded-full font-bold text-lg shadow hover:bg-eco-green hover:text-white transition focus:outline-none focus:ring-2 focus:ring-eco-green dark:bg-gray-900 dark:border-eco-yellow dark:text-eco-yellow dark:hover:bg-eco-yellow dark:hover:text-gray-900 dark:focus:ring-eco-yellow"
+                onClick={() => navigate('/about')}
             >
               Learn More
             </button>
@@ -593,6 +599,7 @@ const Shop = () => {
         </div>
       )}
     </div>
+    </>
   );
 };
 

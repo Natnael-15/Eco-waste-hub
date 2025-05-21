@@ -1,4 +1,5 @@
 import React from 'react';
+import Navbar from '../components/Navbar';
 
 const faqs = [
   {
@@ -24,19 +25,22 @@ const faqs = [
 ];
 
 const FAQ = () => (
-  <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-amber-50 to-emerald-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 transition-colors duration-300 py-16 px-4 flex flex-col items-center">
-    <div className="max-w-2xl w-full bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-8 border-4 border-eco-yellow dark:border-eco-green mb-10">
-      <h1 className="text-4xl font-bold font-playfair text-eco-green dark:text-eco-yellow mb-8">Frequently Asked Questions</h1>
-      <div className="space-y-6">
-        {faqs.map((faq, i) => (
-          <div key={i}>
-            <h2 className="text-lg font-bold text-eco-green dark:text-eco-yellow mb-2">{faq.q}</h2>
-            <p className="text-gray-700 dark:text-eco-yellow/80">{faq.a}</p>
-          </div>
-        ))}
+  <>
+    <Navbar />
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-amber-50 to-emerald-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 transition-colors duration-300 py-16 px-4 flex flex-col items-center pt-20">
+      <div className="max-w-2xl w-full bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-8 border-4 border-eco-yellow dark:border-eco-green mb-10">
+        <h1 className="text-4xl font-bold font-playfair text-eco-green dark:text-eco-yellow mb-8">Frequently Asked Questions</h1>
+        <div className="space-y-6">
+          {faqs.map((faq, i) => (
+            <div key={i}>
+              <h2 className="text-lg font-bold text-eco-green dark:text-eco-yellow mb-2">{faq.q}</h2>
+              <p className="text-gray-700 dark:text-eco-yellow/80">{faq.a}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
-  </div>
+  </>
 );
 
 export default FAQ; 

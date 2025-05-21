@@ -6,6 +6,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { supabase } from '../lib/supabase';
 import { useCart } from '../context/CartContext';
+import Navbar from '../components/Navbar';
 
 // Thank You Modal Component
 const ThankYouModal = ({ isOpen, onClose }) => {
@@ -211,7 +212,12 @@ const PaymentModal = ({ isOpen, onClose, onPaymentComplete, total }) => {
   );
 };
 
-const Checkout = () => {
+interface CheckoutProps {
+  darkMode: boolean;
+  toggleDarkMode: () => void;
+}
+
+const Checkout: React.FC<CheckoutProps> = ({ darkMode, toggleDarkMode }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { clearCartAfterCheckout } = useCart();
@@ -313,6 +319,7 @@ const Checkout = () => {
 
   return (
     <>
+      <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
       <ToastContainer />
       <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-amber-50 to-emerald-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 transition-colors duration-300 flex flex-col items-center justify-center py-16 px-4">
         <div className="w-full max-w-lg bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-8 border-4 border-eco-yellow dark:border-eco-green">

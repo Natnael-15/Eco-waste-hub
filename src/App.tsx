@@ -12,7 +12,6 @@ import FoodDeals from './pages/FoodDeals';
 import Contact from './pages/Contact';
 import JoinUs from './pages/JoinUs';
 import Login from './pages/Login';
-import LearnMore from './pages/LearnMore';
 import BecomePartner from './pages/BecomePartner';
 import SignUp from './pages/SignUp';
 import Checkout from './pages/Checkout';
@@ -26,72 +25,110 @@ import Account from './pages/Account';
 import AdminLogin from './pages/AdminLogin';
 import AdminOrders from './pages/AdminOrders';
 import AdminDonations from './pages/AdminDonations';
-import Presentation from './pages/Presentation';
+import InstagramPage from './pages/InstagramPage';
+import TwitterPage from './pages/TwitterPage';
+import FacebookPage from './pages/FacebookPage';
+import GameArcade from './pages/GameArcade';
+import AdminUsers from './pages/AdminUsers';
+import AdminSettings from './pages/AdminSettings';
+import AdminAdRevenue from './pages/AdminAdRevenue';
 import './App.css';
-import { supabase } from './services/supabase';
+import { supabase } from './lib/supabase';
+import { AdminThemeProvider } from './context/AdminThemeContext';
 
 const AppRoutes: React.FC<{ darkMode: boolean, toggleDarkMode: () => void }> = ({ darkMode, toggleDarkMode }) => {
   const location = useLocation();
+  const hideNavAndFooter = location.pathname === '/login' || location.pathname === '/signup';
+  const isAdminRoute = location.pathname.startsWith('/admin');
   return (
-    <div className={`flex flex-col min-h-screen ${darkMode ? 'dark' : ''}`}>
-      <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+    <div className="flex flex-col min-h-screen">
+      {!hideNavAndFooter && <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />}
       <main className="flex-grow">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/shop" element={<Shop />} />
-          <Route path="/how-it-works" element={<HowItWorks />} />
-          <Route path="/donate" element={<Donate />} />
-          <Route path="/food-deals" element={<FoodDeals />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/join-us" element={<JoinUs />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/learn-more" element={<LearnMore />} />
-          <Route path="/become-partner" element={<BecomePartner />} />
-          <Route path="/sign-up" element={<SignUp />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/faq" element={<FAQ />} />
-          <Route path="/terms" element={<Terms />} />
-          <Route path="/policy" element={<Policy />} />
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/dashboard" element={<UserDashboard />} />
-          <Route path="/account" element={<Account />} />
-          <Route path="/admin-login" element={<AdminLogin />} />
-          <Route path="/admin/orders" element={<AdminOrders />} />
-          <Route path="/admin/donations" element={<AdminDonations />} />
-          <Route path="/presentation" element={<Presentation />} />
-          <Route path="*" element={
-            <div className="flex items-center justify-center min-h-[60vh]">
-              <div className="text-center">
-                <h1 className="text-4xl font-bold text-green-900 mb-4">404</h1>
-                <p className="text-xl text-gray-600 mb-6">Page not found</p>
-                <a href="/" className="text-green-600 hover:text-green-700 underline">
-                  Return to Home
-                </a>
+        {isAdminRoute ? (
+          <AdminThemeProvider>
+            <Routes>
+              <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/admin/orders" element={<AdminOrders />} />
+              <Route path="/admin/donations" element={<AdminDonations />} />
+              <Route path="/admin/users" element={<AdminUsers />} />
+              <Route path="/admin/settings" element={<AdminSettings />} />
+              <Route path="/admin/ad-revenue" element={<AdminAdRevenue />} />
+            </Routes>
+          </AdminThemeProvider>
+        ) : (
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/shop" element={<Shop />} />
+            <Route path="/how-it-works" element={<HowItWorks />} />
+            <Route path="/donate" element={<Donate />} />
+            <Route path="/food-deals" element={<FoodDeals />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/join-us" element={<JoinUs />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/faq" element={<FAQ />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/policy" element={<Policy />} />
+            <Route path="/become-partner" element={<BecomePartner />} />
+            <Route path="/instagram" element={<InstagramPage />} />
+            <Route path="/twitter" element={<TwitterPage />} />
+            <Route path="/facebook" element={<FacebookPage />} />
+            <Route path="/game-arcade" element={<GameArcade />} />
+            <Route path="/dashboard" element={<UserDashboard darkMode={darkMode} toggleDarkMode={toggleDarkMode} />} />
+            <Route path="/account" element={<Account darkMode={darkMode} toggleDarkMode={toggleDarkMode} />} />
+            <Route path="/admin-login" element={<AdminLogin />} />
+            <Route path="*" element={
+              <div className="flex items-center justify-center min-h-[60vh]">
+                <div className="text-center">
+                  <h1 className="text-4xl font-bold text-green-900 mb-4">404</h1>
+                  <p className="text-xl text-gray-600 mb-6">Page not found</p>
+                  <a href="/" className="text-green-600 hover:text-green-700 underline">
+                    Return to Home
+                  </a>
+                </div>
               </div>
-            </div>
-          } />
-        </Routes>
+            } />
+          </Routes>
+        )}
       </main>
-      {!(location.pathname.startsWith('/admin')) && <Footer />}
+      {!(location.pathname.startsWith('/admin')) && !hideNavAndFooter && <Footer />}
     </div>
   );
 };
 
 const App: React.FC = () => {
-  const [darkMode, setDarkMode] = useState(() => {
-    // Try to load from localStorage
-    return localStorage.getItem('darkMode') === 'true';
+  const [darkMode, setDarkMode] = React.useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('theme');
+      if (saved === 'dark' || saved === 'light') return saved === 'dark';
+      if (window.matchMedia('(prefers-color-scheme: dark)').matches) return true;
+    }
+    return false;
   });
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (darkMode) {
       document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
     } else {
       document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
     }
-    localStorage.setItem('darkMode', darkMode.toString());
   }, [darkMode]);
+
+  // Listen for system theme changes
+  React.useEffect(() => {
+    const media = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = () => {
+      if (!localStorage.getItem('theme')) {
+        setDarkMode(media.matches);
+      }
+    };
+    media.addEventListener('change', handleChange);
+    return () => media.removeEventListener('change', handleChange);
+  }, []);
 
   useEffect(() => {
     supabase

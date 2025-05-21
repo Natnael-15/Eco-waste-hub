@@ -5,6 +5,7 @@ import { useNavigate, Navigate } from 'react-router-dom';
 import GoodbyeModal from '../components/GoodbyeModal';
 import { motion } from 'framer-motion';
 import { supabase } from '../lib/supabase';
+import Navbar from '../components/Navbar';
 
 interface OrderItem {
   id: string;
@@ -23,7 +24,12 @@ interface Order {
   items: OrderItem[];
 }
 
-const Account: React.FC = () => {
+interface AccountProps {
+  darkMode: boolean;
+  toggleDarkMode: () => void;
+}
+
+const Account: React.FC<AccountProps> = ({ darkMode, toggleDarkMode }) => {
   const { user, profile, updateProfile, logout } = useAuth();
   const navigate = useNavigate();
   const [editing, setEditing] = useState(false);
@@ -41,11 +47,6 @@ const Account: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
 
-  // Redirect if not authenticated
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
-
   useEffect(() => {
     if (profile) {
       setFullName(profile.full_name || '');
@@ -56,13 +57,11 @@ const Account: React.FC = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       if (!user) return;
-      
       try {
         setLoadingOrders(true);
         const { data, error } = await supabase.rpc('get_user_orders', {
           user_id: user.id
         });
-
         if (error) throw error;
         setOrders(data || []);
       } catch (err: any) {
@@ -71,9 +70,13 @@ const Account: React.FC = () => {
         setLoadingOrders(false);
       }
     };
-
     fetchOrders();
   }, [user]);
+
+  // Move the early return after all hooks
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
 
   const handleSave = async () => {
     setSaving(true);
@@ -130,8 +133,7 @@ const Account: React.FC = () => {
       setIsLoading(true);
       setShowGoodbye(true);
       await new Promise(resolve => setTimeout(resolve, 2000));
-      await logout();
-      navigate('/login', { replace: true });
+      await logout(() => navigate('/login', { replace: true }));
     } catch (error) {
       console.error('Error logging out:', error);
       setShowGoodbye(false);
@@ -151,7 +153,9 @@ const Account: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-300 pt-16">
+    <>
+      <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-300 pt-20">
       {/* Header Section */}
       <div className="bg-eco-green dark:bg-gray-900 text-white p-6 shadow-lg">
         <div className="max-w-7xl mx-auto">
@@ -311,6 +315,7 @@ const Account: React.FC = () => {
       </div>
       <GoodbyeModal isOpen={showGoodbye} userEmail={user.email || ''} />
     </div>
+    </>
   );
 };
 

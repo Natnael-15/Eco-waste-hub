@@ -1,12 +1,17 @@
+import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useState } from 'react';
 import { FaMoon, FaSun, FaRecycle, FaLeaf, FaChartLine, FaTrophy, FaUserCircle } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import GoodbyeModal from './GoodbyeModal';
+import { ShoppingCart, User, Menu, X } from 'lucide-react';
 
-const Navbar = ({ darkMode, toggleDarkMode }: { darkMode?: boolean; toggleDarkMode?: () => void }) => {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [showGoodbye, setShowGoodbye] = useState(false);
+interface NavbarProps {
+  darkMode: boolean;
+  toggleDarkMode: () => void;
+}
+
+const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode }) => {
+  const [showGoodbye, setShowGoodbye] = React.useState(false);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -17,16 +22,13 @@ const Navbar = ({ darkMode, toggleDarkMode }: { darkMode?: boolean; toggleDarkMo
     return null;
   }
 
-  const handleLogout = async () => {
+  const handleSignOut = async () => {
     try {
       setShowGoodbye(true);
-      // Wait for the animation to complete before logging out
-      setTimeout(async () => {
-        await logout();
-        navigate('/login', { replace: true });
-      }, 2000);
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      await logout(() => navigate('/login', { replace: true }));
     } catch (error) {
-      console.error('Error during logout:', error);
+      console.error('Error signing out:', error);
       setShowGoodbye(false);
     }
   };
@@ -45,41 +47,31 @@ const Navbar = ({ darkMode, toggleDarkMode }: { darkMode?: boolean; toggleDarkMo
           <nav className="hidden lg:flex flex-1 justify-center items-center gap-x-10 whitespace-nowrap text-lg font-semibold">
             <Link
               to="/"
-              className={`text-white dark:text-eco-yellow drop-shadow hover:text-eco-yellow dark:hover:text-white transition ${
-                isActive('/') ? '' : ''
-              }`}
+              className={`text-white dark:text-eco-yellow drop-shadow hover:text-eco-yellow dark:hover:text-white transition ${isActive('/') ? '' : ''}`}
             >
               Home
             </Link>
             <Link
               to="/how-it-works"
-              className={`text-white dark:text-eco-yellow drop-shadow hover:text-eco-yellow dark:hover:text-white transition ${
-                isActive('/how-it-works') ? '' : ''
-              }`}
+              className={`text-white dark:text-eco-yellow drop-shadow hover:text-eco-yellow dark:hover:text-white transition ${isActive('/how-it-works') ? '' : ''}`}
             >
               How It Works
             </Link>
             <Link
               to="/shop"
-              className={`text-white dark:text-eco-yellow drop-shadow hover:text-eco-yellow dark:hover:text-white transition ${
-                isActive('/shop') ? '' : ''
-              }`}
+              className={`text-white dark:text-eco-yellow drop-shadow hover:text-eco-yellow dark:hover:text-white transition ${isActive('/shop') ? '' : ''}`}
             >
               Shop
             </Link>
             <Link
               to="/food-deals"
-              className={`text-white dark:text-eco-yellow drop-shadow hover:text-eco-yellow dark:hover:text-white transition ${
-                isActive('/food-deals') ? '' : ''
-              }`}
+              className={`text-white dark:text-eco-yellow drop-shadow hover:text-eco-yellow dark:hover:text-white transition ${isActive('/food-deals') ? '' : ''}`}
             >
               Food Deals
             </Link>
             <Link
               to="/contact"
-              className={`text-white dark:text-eco-yellow drop-shadow hover:text-eco-yellow dark:hover:text-white transition ${
-                isActive('/contact') ? '' : ''
-              }`}
+              className={`text-white dark:text-eco-yellow drop-shadow hover:text-eco-yellow dark:hover:text-white transition ${isActive('/contact') ? '' : ''}`}
             >
               Contact
             </Link>
@@ -98,9 +90,7 @@ const Navbar = ({ darkMode, toggleDarkMode }: { darkMode?: boolean; toggleDarkMo
               <>
                 <Link
                   to="/login"
-                  className={`px-4 py-2 rounded-full text-white dark:text-eco-yellow font-semibold hover:bg-white/10 dark:hover:bg-gray-800 transition ${
-                    isActive('/login') ? '' : ''
-                  }`}
+                  className={`px-4 py-2 rounded-full text-white dark:text-eco-yellow font-semibold hover:bg-white/10 dark:hover:bg-gray-800 transition ${isActive('/login') ? '' : ''}`}
                 >
                   Login
                 </Link>
@@ -114,101 +104,21 @@ const Navbar = ({ darkMode, toggleDarkMode }: { darkMode?: boolean; toggleDarkMo
             ) : (
               <Link
                 to="/dashboard"
-                className={`text-white dark:text-eco-yellow drop-shadow hover:text-eco-yellow dark:hover:text-white transition ${
-                  isActive('/dashboard') ? '' : ''
-                }`}
+                className={`text-white dark:text-eco-yellow drop-shadow hover:text-eco-yellow dark:hover:text-white transition ${isActive('/dashboard') ? '' : ''}`}
               >
                 Dashboard
               </Link>
             )}
             <Link to="/donate" className="px-5 py-2 rounded-full bg-white/20 dark:bg-gray-800 border border-eco-yellow text-eco-yellow font-bold shadow hover:bg-eco-yellow hover:text-eco-green dark:hover:bg-eco-yellow dark:hover:text-eco-green transition">Donate</Link>
             <button
-              aria-label="Toggle dark mode"
+              aria-label="Toggle theme"
               onClick={toggleDarkMode}
-              className="ml-8 p-2 rounded-full bg-white/10 dark:bg-gray-800 hover:bg-white/20 dark:hover:bg-gray-700 text-white dark:text-eco-yellow text-xl transition border border-eco-yellow"
+              className="ml-4 p-2 rounded-full bg-white/10 dark:bg-gray-800 hover:bg-white/20 dark:hover:bg-gray-700 text-white dark:text-eco-yellow text-xl transition border border-eco-yellow"
             >
               {darkMode ? <FaSun /> : <FaMoon />}
             </button>
-            <button className="lg:hidden text-3xl text-white ml-2" onClick={() => setMenuOpen(!menuOpen)}>
-              ☰
-            </button>
           </div>
         </div>
-        {/* Mobile menu */}
-        {menuOpen && (
-          <nav className="lg:hidden bg-eco-green dark:bg-gray-900 text-white dark:text-eco-yellow font-semibold text-lg px-4 py-4 rounded-b-xl shadow space-y-2 animate-fade-in">
-            <Link
-              to="/"
-              className={`block py-2 px-2 rounded hover:text-eco-yellow dark:hover:text-white ${
-                isActive('/') ? '' : ''
-              }`}
-            >
-              Home
-            </Link>
-            <Link
-              to="/how-it-works"
-              className={`block py-2 px-2 rounded hover:text-eco-yellow dark:hover:text-white ${
-                isActive('/how-it-works') ? '' : ''
-              }`}
-            >
-              How It Works
-            </Link>
-            <Link
-              to="/shop"
-              className={`block py-2 px-2 rounded hover:text-eco-yellow dark:hover:text-white ${
-                isActive('/shop') ? '' : ''
-              }`}
-            >
-              Shop
-            </Link>
-            <Link
-              to="/food-deals"
-              className={`block py-2 px-2 rounded hover:text-eco-yellow dark:hover:text-white ${
-                isActive('/food-deals') ? '' : ''
-              }`}
-            >
-              Food Deals
-            </Link>
-            <Link
-              to="/contact"
-              className={`block py-2 px-2 rounded hover:text-eco-yellow dark:hover:text-white ${
-                isActive('/contact') ? '' : ''
-              }`}
-            >
-              Contact
-            </Link>
-            <div className="pt-2 border-t border-white/10 dark:border-gray-700 mt-2 space-y-2">
-              {!isLoggedIn ? (
-                <>
-                  <Link
-                    to="/login"
-                    className={`block py-2 px-2 rounded hover:bg-white/10 dark:hover:bg-gray-800 transition ${
-                      isActive('/login') ? '' : ''
-                    }`}
-                  >
-                    Login
-                  </Link>
-                  <Link
-                    to="/join-us"
-                    className="block py-2 px-2 rounded-full bg-eco-yellow text-eco-green font-bold text-center hover:bg-yellow-300 transition"
-                  >
-                    Sign Up
-                  </Link>
-                </>
-              ) : (
-                <Link
-                  to="/dashboard"
-                  className={`block py-2 px-2 rounded hover:bg-white/10 dark:hover:bg-gray-800 transition ${
-                    isActive('/dashboard') ? '' : ''
-                  }`}
-                >
-                  Dashboard
-                </Link>
-              )}
-              <Link to="/donate" className="block py-2 px-2 rounded-full bg-white/20 dark:bg-gray-800 border border-eco-yellow text-eco-yellow font-bold text-center hover:bg-eco-yellow hover:text-eco-green dark:hover:bg-eco-yellow dark:hover:text-eco-green transition">Donate</Link>
-            </div>
-          </nav>
-        )}
       </header>
       <GoodbyeModal isOpen={showGoodbye} userEmail={user?.email || ''} />
     </>

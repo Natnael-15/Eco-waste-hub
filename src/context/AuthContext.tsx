@@ -1,9 +1,9 @@
 /** @jsxImportSource react */
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
-import { supabase } from '../services/supabase';
+import { supabase } from '../lib/supabase';
 import type { User } from '@supabase/supabase-js';
-import WelcomeModal from '../components/WelcomeModal';
+import SplashScreen from '../components/SplashScreen';
 
 interface Profile {
   id: string;
@@ -29,10 +29,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [showWelcome, setShowWelcome] = useState(false);
-  const [lastConnectionTest, setLastConnectionTest] = useState<number>(0);
-  const CONNECTION_TEST_INTERVAL = 5000;
+  const [loggedOut, setLoggedOut] = useState(false);
 
   const fetchProfile = async (userId: string) => {
     try {
@@ -82,76 +80,32 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  useEffect(() => {
-    const checkSession = async () => {
-      try {
-        console.log('[AUTH] Checking session on mount...');
-        const timeout = setTimeout(() => {
-          console.error('[AUTH] getSession() is taking too long or hanging!');
-        }, 2000);
-
-        const result = await supabase.auth.getSession();
-        clearTimeout(timeout);
-
-        console.log('[AUTH] getSession() result:', result);
-        const { data: { session }, error } = result;
-        if (error) {
-          console.error('[AUTH] getSession() error:', error);
-          throw error;
-        }
-        if (session) {
-          console.log('[AUTH] Session found:', session);
-          setUser(session.user);
-          const prof = await fetchProfile(session.user.id);
-          setProfile(prof);
-        } else {
-          console.log('[AUTH] No session found');
-          setUser(null);
-          setProfile(null);
-        }
-      } catch (err) {
-        console.error('[AUTH] Error checking session:', err);
-        setUser(null);
-        setProfile(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    checkSession();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_OUT') {
-        setUser(null);
-        setProfile(null);
-        localStorage.removeItem('userName');
-      } else if (session) {
-        setUser(session.user);
-        const prof = await fetchProfile(session.user.id);
-        setProfile(prof);
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
-
   const login = async (email: string, password: string) => {
     setLoading(true);
-    setError(null);
     try {
+      // 1. Sign in with Supabase
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) throw error;
+      
       if (data?.user) {
+        // 2. Set user state
         setUser(data.user);
+        setLoggedOut(false);
+        
+        // 3. Fetch and set profile
         const prof = await fetchProfile(data.user.id);
         setProfile(prof);
-        localStorage.setItem('userName', prof.name || '');
+        
+        // 4. Store name in localStorage if available
+        if (prof?.name) {
+          localStorage.setItem('userName', prof.name);
+        }
+        
+        // 5. Show welcome message
         setShowWelcome(true);
         
         return new Promise<void>((resolve) => {
@@ -161,33 +115,47 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           }, 2000);
         });
       }
+    } catch (error) {
+      console.error('Error during login:', error);
+      throw error;
     } finally {
       setLoading(false);
     }
   };
 
-  const logout = async () => {
+  const logout = async (onLoggedOut?: () => void) => {
     try {
+      // 1. Set loggedOut state to prevent session checks
+      setLoggedOut(true);
+      
+      // 2. Sign out from Supabase
+      const { error: signOutError } = await supabase.auth.signOut();
+      if (signOutError) throw signOutError;
+      
+      // 3. Clear all local state
       setUser(null);
       setProfile(null);
+      
+      // 4. Clear all auth-related storage
       localStorage.removeItem('userName');
       Object.keys(localStorage).forEach(key => {
         if (key.startsWith('sb-') || key.includes('supabase')) {
           localStorage.removeItem(key);
         }
       });
-      const { error: signOutError } = await supabase.auth.signOut({ scope: 'global' });
-      if (signOutError) throw signOutError;
-      await supabase.auth.signOut({ scope: 'local' });
+      
+      // 5. Call the callback if provided
+      if (onLoggedOut) onLoggedOut();
     } catch (error) {
-      console.error('Error logging out:', error);
+      console.error('Error during logout:', error);
+      // Reset loggedOut state if logout fails
+      setLoggedOut(false);
       throw error;
     }
   };
 
   const signup = async (name: string, email: string, password: string) => {
     setLoading(true);
-    setError(null);
     try {
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -224,10 +192,84 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  useEffect(() => {
+    const checkSession = async () => {
+      if (loggedOut) return;
+      
+      try {
+        // 1. Get current session
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) throw error;
+        
+        if (session) {
+          // 2. Set user state
+          setUser(session.user);
+          setLoggedOut(false);
+          
+          // 3. Fetch and set profile
+          const prof = await fetchProfile(session.user.id);
+          setProfile(prof);
+          
+          // 4. Store name in localStorage if available
+          if (prof?.name) {
+            localStorage.setItem('userName', prof.name);
+          }
+        } else {
+          // 5. Clear states if no session
+          setUser(null);
+          setProfile(null);
+        }
+      } catch (err) {
+        console.error('[AUTH] Session check failed:', err);
+        setUser(null);
+        setProfile(null);
+        // Clear any stale auth data
+        localStorage.removeItem('userName');
+        Object.keys(localStorage).forEach(key => {
+          if (key.startsWith('sb-') || key.includes('supabase')) {
+            localStorage.removeItem(key);
+          }
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkSession();
+
+    // 6. Set up auth state change listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_OUT') {
+        setUser(null);
+        setProfile(null);
+        setLoggedOut(true);
+        localStorage.removeItem('userName');
+        // Clear all Supabase-related items
+        Object.keys(localStorage).forEach(key => {
+          if (key.startsWith('sb-') || key.includes('supabase')) {
+            localStorage.removeItem(key);
+          }
+        });
+      } else if (session) {
+        setLoggedOut(false);
+        setUser(session.user);
+        const prof = await fetchProfile(session.user.id);
+        setProfile(prof);
+        if (prof?.name) {
+          localStorage.setItem('userName', prof.name);
+        }
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [loggedOut]);
+
   return (
     <AuthContext.Provider value={{ user, profile, loading, login, logout, signup, updateProfile, setUser }}>
       {children}
-      <WelcomeModal isOpen={showWelcome} userEmail={user?.email || ''} />
+      {showWelcome && <SplashScreen onFinish={() => setShowWelcome(false)} />}
     </AuthContext.Provider>
   );
 };

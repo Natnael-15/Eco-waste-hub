@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { FaHandHoldingHeart, FaLeaf, FaLock, FaRegSmile, FaRedo } from 'react-icons/fa';
-import { supabase } from '../services/supabase';
+import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
+import Navbar from '../components/Navbar';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const impactStats = [
-  { icon: <FaLeaf className="text-eco-green dark:text-eco-yellow text-2xl" />, label: 'Meals Saved', value: '2,500+' },
-  { icon: <FaHandHoldingHeart className="text-eco-yellow dark:text-eco-yellow text-2xl" />, label: 'Families Helped', value: '800+' },
-  { icon: <FaRegSmile className="text-eco-green dark:text-eco-yellow text-2xl" />, label: 'Volunteers', value: '120+' },
+  { icon: <FaLeaf className="text-eco-green dark:text-eco-yellow text-4xl" />, label: 'Meals Saved', value: 2500 },
+  { icon: <FaHandHoldingHeart className="text-eco-yellow dark:text-eco-yellow text-4xl" />, label: 'Families Helped', value: 800 },
+  { icon: <FaRegSmile className="text-eco-green dark:text-eco-yellow text-4xl" />, label: 'Volunteers', value: 120 },
 ];
 
 const partners = [
@@ -17,7 +19,71 @@ const partners = [
 
 const presetAmounts = [5, 10, 20];
 
-const Donate: React.FC = () => {
+const partnerDetails = {
+  FoodShare: {
+    description: 'FoodShare is a leading food rescue organization dedicated to redistributing surplus food to families in need. Their mission is to fight hunger and reduce food waste by connecting local businesses with community organizations.',
+    website: 'https://foodshare.org',
+  },
+  EcoTrust: {
+    description: 'EcoTrust empowers communities to build a sustainable future through innovative food recovery programs and environmental education. They partner with local farms and markets to ensure no good food goes to waste.',
+    website: 'https://ecotrust.org',
+  },
+  GreenAid: {
+    description: 'GreenAid supports eco-friendly initiatives and food security projects, helping to create greener, healthier communities. Their volunteers work tirelessly to rescue food and provide support to vulnerable families.',
+    website: 'https://greenaid.org',
+  },
+};
+
+const PartnerModal = ({ open, onClose, partner }) => {
+  if (!open || !partner) return null;
+  const details = partnerDetails[partner.name];
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-8 max-w-md w-full relative border-2 border-eco-green/30 dark:border-eco-yellow/30">
+        <button onClick={onClose} className="absolute top-3 right-3 text-gray-400 hover:text-eco-green dark:hover:text-eco-yellow text-2xl font-bold">&times;</button>
+        <div className="flex flex-col items-center">
+          <div className="bg-white dark:bg-gray-800 rounded-full p-4 shadow mb-4 border-2 border-eco-green/20 dark:border-eco-yellow/20">
+            <img src={partner.logo} alt={partner.name} className="h-16 w-16 object-contain" />
+          </div>
+          <h3 className="text-xl font-bold text-eco-green dark:text-eco-yellow mb-2">{partner.name}</h3>
+          <p className="text-gray-700 dark:text-gray-200 mb-4 text-center">{details?.description}</p>
+          {details?.website && (
+            <a href={details.website} target="_blank" rel="noopener noreferrer" className="inline-block px-4 py-2 bg-eco-green dark:bg-eco-yellow text-white dark:text-eco-green rounded-full font-semibold hover:bg-eco-yellow hover:text-eco-green dark:hover:bg-eco-green dark:hover:text-white transition">Visit Website</a>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+interface DonateProps {
+  darkMode: boolean;
+  toggleDarkMode: () => void;
+}
+
+// Animated number component
+const AnimatedNumber = ({ value, suffix = '', className = '' }) => {
+  const [display, setDisplay] = useState(0);
+  React.useEffect(() => {
+    let start = display;
+    let end = value;
+    if (start === end) return;
+    let step = Math.ceil(Math.abs(end - start) / 20) * Math.sign(end - start);
+    const interval = setInterval(() => {
+      setDisplay(d => {
+        if ((step > 0 && d + step >= end) || (step < 0 && d + step <= end)) {
+          clearInterval(interval);
+          return end;
+        }
+        return d + step;
+      });
+    }, 20);
+    return () => clearInterval(interval);
+  }, [value]);
+  return <span className={className}>{display.toLocaleString()}{suffix}</span>;
+};
+
+const Donate: React.FC<DonateProps> = ({ darkMode, toggleDarkMode }) => {
   const [amount, setAmount] = useState<number | ''>('');
   const [customAmount, setCustomAmount] = useState('');
   const [recurring, setRecurring] = useState(false);
@@ -26,6 +92,7 @@ const Donate: React.FC = () => {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
   const { user } = useAuth();
+  const [openPartner, setOpenPartner] = useState(null);
 
   const handleAmountClick = (amt: number) => {
     setAmount(amt);
@@ -61,14 +128,13 @@ const Donate: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
+    <>
+      <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+      <div className="min-h-screen bg-gradient-to-br from-eco-green/10 via-eco-yellow/10 to-eco-green/5 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 transition-colors duration-300 pt-20">
       {/* Hero Section */}
       <section className="relative min-h-[40vh] flex items-center justify-center bg-gradient-to-br from-eco-green via-eco-green/80 to-eco-green/60 dark:from-gray-800 dark:via-gray-900 dark:to-gray-800 pt-20">
         <div className="absolute inset-0 bg-[url('https://images.pexels.com/photos/6646910/pexels-photo-6646910.jpeg?auto=compress&w=1200&q=80')] bg-cover bg-center opacity-30 mix-blend-multiply"></div>
         <div className="relative z-10 max-w-2xl mx-auto text-center py-12 px-4 flex flex-col items-center">
-          <div className="bg-eco-yellow/90 rounded-full w-16 h-16 flex items-center justify-center mb-4 shadow-lg">
-            <FaHandHoldingHeart className="text-eco-green dark:text-eco-yellow text-3xl" />
-          </div>
           <h1 className="text-4xl md:text-5xl font-bold font-playfair text-white mb-3 drop-shadow-lg">Make a Difference Today</h1>
           <p className="text-lg text-white/90 mb-4">Your donation helps us rescue food, support families, and build a greener future. Every pound counts!</p>
           <a href="#donate-form" className="bg-eco-yellow text-eco-green font-bold px-8 py-3 rounded-lg shadow hover:bg-yellow-300 transition text-lg">Donate Now</a>
@@ -76,20 +142,28 @@ const Donate: React.FC = () => {
       </section>
 
       {/* Impact Highlights */}
-      <section className="max-w-4xl mx-auto px-4 py-10 grid md:grid-cols-3 gap-8 text-center">
+        <section className="max-w-4xl mx-auto grid md:grid-cols-3 gap-8 py-10 px-4">
         {impactStats.map(stat => (
-          <div key={stat.label} className="bg-white dark:bg-gray-900 rounded-xl shadow p-6 flex flex-col items-center gap-2">
-            {stat.icon}
-            <div className="text-2xl font-bold text-eco-green font-playfair">{stat.value}</div>
-            <div className="text-gray-500 dark:text-gray-300 text-sm">{stat.label}</div>
-          </div>
+            <motion.div
+              key={stat.label}
+              className="bg-white/60 dark:bg-gray-900/70 backdrop-blur-lg rounded-2xl shadow-xl p-8 flex flex-col items-center gap-3 border border-eco-green/10 dark:border-eco-yellow/10"
+              whileHover={{ scale: 1.04 }}
+            >
+              <div className="text-4xl mb-2">{stat.icon}</div>
+              <AnimatedNumber value={stat.value} suffix="+" className="text-3xl font-extrabold text-eco-green dark:text-eco-yellow" />
+              <div className="text-gray-600 dark:text-gray-300 text-lg">{stat.label}</div>
+            </motion.div>
         ))}
       </section>
 
       {/* Donation Form */}
       <section id="donate-form" className="max-w-2xl mx-auto px-4 py-10">
-        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-8">
-          <h2 className="text-2xl font-bold text-eco-green mb-6 font-playfair">Donate</h2>
+          <motion.div
+            className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg rounded-3xl shadow-2xl p-10 border border-eco-green/20 dark:border-eco-yellow/20"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <h2 className="text-3xl font-bold text-eco-green dark:text-eco-yellow mb-6 font-playfair">Donate</h2>
           {submitted ? (
             <div className="text-green-700 dark:text-green-400 text-center py-8">
               <div className="text-4xl mb-2">🎉</div>
@@ -100,13 +174,13 @@ const Donate: React.FC = () => {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label className="block text-gray-700 dark:text-eco-yellow font-semibold mb-2">Donation Amount</label>
-                <div className="flex gap-3 mb-3">
+                  <div className="flex gap-3 mb-3 flex-wrap">
                   {presetAmounts.map(amt => (
                     <button
                       type="button"
                       key={amt}
                       onClick={() => handleAmountClick(amt)}
-                      className={`px-5 py-2 rounded-full font-bold border transition ${amount === amt ? 'bg-eco-green text-white border-eco-green' : 'bg-gray-100 dark:bg-gray-800 text-eco-green border-eco-green/30 hover:bg-eco-yellow/30'}`}
+                        className={`px-5 py-2 rounded-full font-bold border transition ${amount === amt ? 'bg-eco-green text-white border-eco-green shadow-lg scale-105' : 'bg-gray-100 dark:bg-gray-800 text-eco-green border-eco-green/30 hover:bg-eco-yellow/30'}`}
                     >
                       £{amt}
                     </button>
@@ -121,16 +195,18 @@ const Donate: React.FC = () => {
                   />
                 </div>
                 <div className="flex items-center gap-2 mb-3">
-                  <input
-                    type="checkbox"
-                    id="recurring"
-                    checked={recurring}
-                    onChange={() => setRecurring(r => !r)}
-                    className="accent-eco-green w-5 h-5"
-                  />
-                  <label htmlFor="recurring" className="text-eco-green dark:text-eco-yellow font-semibold flex items-center gap-1 cursor-pointer">
-                    <FaRedo className="inline-block text-eco-green dark:text-eco-yellow" /> Make this a monthly donation
-                  </label>
+                    {/* Toggle switch for recurring donation */}
+                    <button
+                      type="button"
+                      aria-pressed={recurring}
+                      onClick={() => setRecurring(r => !r)}
+                      className={`w-12 h-7 flex items-center rounded-full p-1 transition-colors duration-300 ${recurring ? 'bg-eco-green' : 'bg-gray-300 dark:bg-gray-700'}`}
+                    >
+                      <span className={`w-5 h-5 bg-white rounded-full shadow transform transition-transform duration-300 ${recurring ? 'translate-x-5' : ''}`}></span>
+                    </button>
+                    <span className="text-eco-green dark:text-eco-yellow font-semibold flex items-center gap-1 cursor-pointer select-none">
+                      <FaRedo className="inline-block text-eco-green dark:text-eco-yellow" /> Monthly donation
+                    </span>
                 </div>
               </div>
               <div className="relative">
@@ -156,29 +232,45 @@ const Donate: React.FC = () => {
                 <label className="absolute left-3 top-3 text-gray-500 dark:text-eco-yellow pointer-events-none transition-all duration-200 peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-focus:-top-4 peer-focus:text-xs peer-focus:text-eco-green bg-white dark:bg-gray-800 px-1">Message (optional)</label>
               </div>
               {error && <div className="text-red-600 dark:text-red-400 text-sm mb-2">{error}</div>}
-              <button type="submit" className="w-full bg-eco-yellow text-eco-green font-bold py-3 rounded-lg hover:bg-yellow-300 transition text-lg flex items-center justify-center gap-2">
+                <button type="submit" className="w-full bg-eco-yellow text-eco-green font-bold py-3 rounded-lg hover:bg-yellow-300 transition text-lg flex items-center justify-center gap-2 shadow-lg">
                 <FaHandHoldingHeart className="text-eco-green dark:text-eco-yellow" /> Donate
               </button>
             </form>
           )}
-        </div>
+          </motion.div>
       </section>
 
-      {/* Trust & Security Section */}
+        {/* Trust & Partners Section */}
       <section className="max-w-4xl mx-auto px-4 pb-12">
-        <div className="bg-white dark:bg-gray-900 rounded-xl shadow p-8 flex flex-col md:flex-row items-center gap-8 justify-between">
+          <div className="bg-white/80 dark:bg-gray-900/80 rounded-xl shadow-lg p-8 flex flex-col md:flex-row items-center gap-8 justify-between border border-eco-green/10 dark:border-eco-yellow/10">
           <div className="flex-1 flex flex-col gap-3 mb-6 md:mb-0">
-            <div className="flex items-center gap-2 text-eco-green dark:text-eco-yellow font-bold"><FaLock className="text-eco-green dark:text-eco-yellow" /> 100% Secure Payment</div>
+              <span className="inline-flex items-center gap-2 px-3 py-1 bg-eco-green/10 dark:bg-eco-yellow/10 rounded-full font-bold text-eco-green dark:text-eco-yellow">
+                <FaLock className="text-eco-green dark:text-eco-yellow" /> 100% Secure Payment
+              </span>
             <div className="text-gray-500 dark:text-gray-300 text-sm">Your donation is protected and encrypted.</div>
           </div>
-          <div className="flex-1 flex flex-wrap gap-6 items-center justify-center">
+            <div className="flex-1 flex flex-col items-center justify-center">
+              <div className="mb-2 text-center">
+                <span className="inline-block px-4 py-1 bg-eco-green/20 dark:bg-eco-yellow/20 rounded-full text-eco-green dark:text-eco-yellow font-semibold tracking-wide text-sm uppercase shadow-sm border border-eco-green/30 dark:border-eco-yellow/30">Trusted Partners</span>
+              </div>
+              <div className="flex gap-8 items-end justify-center">
             {partners.map(partner => (
-              <img key={partner.name} src={partner.logo} alt={partner.name} className="h-10 object-contain transition" />
+                  <button key={partner.name} type="button" onClick={() => setOpenPartner(partner)} className="focus:outline-none">
+                    <div className="flex flex-col items-center group">
+                      <div className="bg-white dark:bg-gray-800 rounded-full p-3 shadow-md border-2 border-eco-green/20 dark:border-eco-yellow/20 mb-2 transition-transform group-hover:scale-105">
+                        <img src={partner.logo} alt={partner.name} className="h-12 w-12 object-contain grayscale hover:grayscale-0 transition" />
+                      </div>
+                      <span className="text-xs font-bold text-eco-green dark:text-eco-yellow mt-1 tracking-wide uppercase opacity-80">{partner.name}</span>
+                    </div>
+                  </button>
             ))}
           </div>
         </div>
+          </div>
+          <PartnerModal open={!!openPartner} onClose={() => setOpenPartner(null)} partner={openPartner} />
       </section>
     </div>
+    </>
   );
 };
 

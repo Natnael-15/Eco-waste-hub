@@ -1,3 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --eco-green: #2ecc71;
+  --eco-yellow: #f1c40f;
+}
+
+@layer base {
+  body {
+    @apply bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-eco-yellow;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-eco-green text-white px-4 py-2 rounded-lg hover:bg-eco-yellow hover:text-eco-green dark:bg-eco-yellow dark:text-gray-900 dark:hover:bg-eco-green dark:hover:text-white transition;
+  }
+
+  .btn-secondary {
+    @apply bg-white border border-eco-green text-eco-green px-4 py-2 rounded-lg hover:bg-eco-green hover:text-white dark:bg-gray-800 dark:border-eco-yellow dark:text-eco-yellow dark:hover:bg-eco-yellow dark:hover:text-gray-900 transition;
+  }
+}
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+
+  .animate-shake {
+    animation: shake 0.5s ease-in-out;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
+
 /* App-level styles */
 
 .flex {

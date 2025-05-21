@@ -6,6 +6,8 @@ import { FaUserShield, FaUsers, FaShoppingBag, FaHandHoldingHeart, FaLeaf, FaTru
 import AdminFooter from '../components/AdminFooter';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { useAuth } from '../context/AuthContext';
+import AdminNavbar from '../components/AdminNavbar';
+import { useAdminTheme } from '../context/AdminThemeContext';
 
 const FAKE_USERS = [
   { id: 'U-001', name: 'Jane Doe', email: 'jane@example.com', role: 'user' },
@@ -96,7 +98,23 @@ function getRoute(i) {
   return route;
 }
 
-const AdminDashboard: React.FC = () => {
+interface AdminDashboardProps {
+  darkMode: boolean;
+  toggleDarkMode: () => void;
+}
+
+// Utility to clean up legacy localStorage keys for fake users, orders, and donations
+function cleanupLegacyLocalStorage() {
+  // Remove old fake users key(s)
+  if (localStorage.getItem('users')) localStorage.removeItem('users');
+  // Remove old fake orders key(s)
+  if (localStorage.getItem('orders')) localStorage.removeItem('orders');
+  // Remove old fake donations key(s)
+  if (localStorage.getItem('donations')) localStorage.removeItem('donations');
+}
+
+const AdminDashboard: React.FC<AdminDashboardProps> = () => {
+  const { darkMode, toggleDarkMode } = useAdminTheme();
   const navigate = useNavigate();
   const { logout } = useAuth();
   const [admin, setAdmin] = useState<any>(null);
@@ -122,6 +140,11 @@ const AdminDashboard: React.FC = () => {
     }));
   });
   const deliveryInterval = useRef<NodeJS.Timeout | null>(null);
+
+  // Automatic cleanup of legacy localStorage keys
+  useEffect(() => {
+    cleanupLegacyLocalStorage();
+  }, []);
 
   // Inject fake data if empty
   useEffect(() => {
@@ -238,234 +261,238 @@ const AdminDashboard: React.FC = () => {
   const handleAdminLogout = async () => {
     try {
       await logout();
-      navigate('/admin-login');
+      navigate('/admin-login', { replace: true });
     } catch (error) {
+      console.error('Error logging out:', error);
       alert('Error logging out. Please try again.');
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-eco-green via-amber-50 to-emerald-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 py-12 px-4 pb-32">
-      <motion.div initial={{ opacity: 0, y: -30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}
-        className="max-w-7xl mx-auto bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border-4 border-eco-green dark:border-eco-yellow p-8">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-eco-green dark:text-eco-yellow font-playfair flex items-center gap-2">
-              <FaUserShield className="text-eco-green dark:text-eco-yellow" /> Admin Dashboard
-            </h1>
-            <p className="text-gray-500 dark:text-gray-300 mt-2">Welcome, {admin?.name || 'Admin'}!</p>
+    <>
+      <AdminNavbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+      <div className={`min-h-screen bg-gradient-to-br ${darkMode ? 'from-gray-950 via-gray-900 to-gray-950' : 'from-eco-green via-amber-50 to-emerald-100'} py-12 px-4 pb-32 pt-24`}>
+        <motion.div initial={{ opacity: 0, y: -30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}
+          className="max-w-7xl mx-auto bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border-4 border-eco-green dark:border-eco-yellow p-8">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
+            <div>
+              <h1 className="text-3xl font-bold text-eco-green dark:text-eco-yellow font-playfair flex items-center gap-2">
+                <FaUserShield className="text-eco-green dark:text-eco-yellow" /> Admin Dashboard
+              </h1>
+              <p className="text-gray-500 dark:text-gray-300 mt-2">Welcome, {admin?.name || 'Admin'}!</p>
+            </div>
+            <button
+              onClick={handleAdminLogout}
+              className="px-6 py-2 rounded-lg bg-eco-green dark:bg-eco-yellow text-white dark:text-gray-900 font-bold hover:bg-eco-yellow hover:text-eco-green dark:hover:bg-eco-green dark:hover:text-white transition"
+            >
+              Log Out
+            </button>
           </div>
-          <button
-            onClick={handleAdminLogout}
-            className="px-6 py-2 rounded-lg bg-eco-green dark:bg-eco-yellow text-white dark:text-gray-900 font-bold hover:bg-eco-yellow hover:text-eco-green dark:hover:bg-eco-green dark:hover:text-white transition"
-          >
-            Log Out
-          </button>
-        </div>
-        {/* Summary Cards */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-          className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
-          <div className="bg-eco-green/10 dark:bg-eco-yellow/10 rounded-xl p-6 flex flex-col items-center shadow">
-            <FaUsers className="text-3xl text-eco-green dark:text-eco-yellow mb-2" />
-            <div className="text-2xl font-bold text-eco-green dark:text-eco-yellow">{totalUsers}</div>
-            <div className="text-gray-600 dark:text-gray-300">Users</div>
+          {/* Summary Cards */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+            className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+            <div className="bg-eco-green/10 dark:bg-eco-yellow/10 rounded-xl p-6 flex flex-col items-center shadow">
+              <FaUsers className="text-3xl text-eco-green dark:text-eco-yellow mb-2" />
+              <div className="text-2xl font-bold text-eco-green dark:text-eco-yellow">{totalUsers}</div>
+              <div className="text-gray-600 dark:text-gray-300">Users</div>
+            </div>
+            <div className="bg-eco-green/10 dark:bg-eco-yellow/10 rounded-xl p-6 flex flex-col items-center shadow">
+              <FaShoppingBag className="text-3xl text-eco-green dark:text-eco-yellow mb-2" />
+              <div className="text-2xl font-bold text-eco-green dark:text-eco-yellow">{totalOrders}</div>
+              <div className="text-gray-600 dark:text-gray-300">Orders</div>
+            </div>
+            <div className="bg-eco-green/10 dark:bg-eco-yellow/10 rounded-xl p-6 flex flex-col items-center shadow">
+              <FaHandHoldingHeart className="text-3xl text-eco-green dark:text-eco-yellow mb-2" />
+              <div className="text-2xl font-bold text-eco-green dark:text-eco-yellow">{totalDonations}</div>
+              <div className="text-gray-600 dark:text-gray-300">Donations</div>
+            </div>
+            <div className="bg-eco-green/10 dark:bg-eco-yellow/10 rounded-xl p-6 flex flex-col items-center shadow">
+              <FaLeaf className="text-3xl text-eco-green dark:text-eco-yellow mb-2" />
+              <div className="text-2xl font-bold text-eco-green dark:text-eco-yellow">£{totalValue.toFixed(2)}</div>
+              <div className="text-gray-600 dark:text-gray-300">Total Value</div>
+            </div>
+          </motion.div>
+          {/* Orders/Donations Buttons Side by Side */}
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }}
+            className="flex flex-row gap-6 mb-10 justify-center items-center">
+            <button
+              onClick={() => navigate('/admin/orders')}
+              className="w-64 h-32 rounded-2xl bg-eco-green dark:bg-eco-yellow text-white dark:text-eco-green text-2xl font-bold flex flex-col items-center justify-center shadow-xl hover:scale-105 hover:bg-eco-yellow hover:text-eco-green dark:hover:bg-eco-green dark:hover:text-eco-yellow transition-all duration-200 border-4 border-eco-yellow dark:border-eco-green"
+            >
+              <FaShoppingBag className="text-4xl mb-2" />
+              Orders
+            </button>
+            <button
+              onClick={() => navigate('/admin/donations')}
+              className="w-64 h-32 rounded-2xl bg-eco-yellow dark:bg-eco-green text-eco-green dark:text-eco-yellow text-2xl font-bold flex flex-col items-center justify-center shadow-xl hover:scale-105 hover:bg-eco-green hover:text-eco-yellow dark:hover:bg-eco-yellow dark:hover:text-eco-green transition-all duration-200 border-4 border-eco-green dark:border-eco-yellow"
+            >
+              <FaHandHoldingHeart className="text-4xl mb-2" />
+              Donations
+            </button>
+          </motion.div>
+          {/* User Search */}
+          <div className="mb-10 flex justify-center">
+            <div className="relative w-full max-w-md">
+              <FaSearch className="absolute left-3 top-3 text-eco-green dark:text-eco-yellow" />
+              <input
+                type="text"
+                placeholder="Search users by name or email..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                className="pl-10 pr-4 py-2 rounded-lg border-2 border-eco-green dark:border-eco-yellow bg-white dark:bg-gray-900 text-eco-green dark:text-eco-yellow focus:outline-none focus:ring-2 focus:ring-eco-green/20 dark:focus:ring-eco-yellow/20 w-full"
+              />
+            </div>
           </div>
-          <div className="bg-eco-green/10 dark:bg-eco-yellow/10 rounded-xl p-6 flex flex-col items-center shadow">
-            <FaShoppingBag className="text-3xl text-eco-green dark:text-eco-yellow mb-2" />
-            <div className="text-2xl font-bold text-eco-green dark:text-eco-yellow">{totalOrders}</div>
-            <div className="text-gray-600 dark:text-gray-300">Orders</div>
-          </div>
-          <div className="bg-eco-green/10 dark:bg-eco-yellow/10 rounded-xl p-6 flex flex-col items-center shadow">
-            <FaHandHoldingHeart className="text-3xl text-eco-green dark:text-eco-yellow mb-2" />
-            <div className="text-2xl font-bold text-eco-green dark:text-eco-yellow">{totalDonations}</div>
-            <div className="text-gray-600 dark:text-gray-300">Donations</div>
-          </div>
-          <div className="bg-eco-green/10 dark:bg-eco-yellow/10 rounded-xl p-6 flex flex-col items-center shadow">
-            <FaLeaf className="text-3xl text-eco-green dark:text-eco-yellow mb-2" />
-            <div className="text-2xl font-bold text-eco-green dark:text-eco-yellow">£{totalValue.toFixed(2)}</div>
-            <div className="text-gray-600 dark:text-gray-300">Total Value</div>
-          </div>
-        </motion.div>
-        {/* Orders/Donations Buttons Side by Side */}
-        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }}
-          className="flex flex-row gap-6 mb-10 justify-center items-center">
-          <button
-            onClick={() => navigate('/admin/orders')}
-            className="w-64 h-32 rounded-2xl bg-eco-green dark:bg-eco-yellow text-white dark:text-eco-green text-2xl font-bold flex flex-col items-center justify-center shadow-xl hover:scale-105 hover:bg-eco-yellow hover:text-eco-green dark:hover:bg-eco-green dark:hover:text-eco-yellow transition-all duration-200 border-4 border-eco-yellow dark:border-eco-green"
-          >
-            <FaShoppingBag className="text-4xl mb-2" />
-            Orders
-          </button>
-          <button
-            onClick={() => navigate('/admin/donations')}
-            className="w-64 h-32 rounded-2xl bg-eco-yellow dark:bg-eco-green text-eco-green dark:text-eco-yellow text-2xl font-bold flex flex-col items-center justify-center shadow-xl hover:scale-105 hover:bg-eco-green hover:text-eco-yellow dark:hover:bg-eco-yellow dark:hover:text-eco-green transition-all duration-200 border-4 border-eco-green dark:border-eco-yellow"
-          >
-            <FaHandHoldingHeart className="text-4xl mb-2" />
-            Donations
-          </button>
-        </motion.div>
-        {/* User Search */}
-        <div className="mb-10 flex justify-center">
-          <div className="relative w-full max-w-md">
-            <FaSearch className="absolute left-3 top-3 text-eco-green dark:text-eco-yellow" />
-            <input
-              type="text"
-              placeholder="Search users by name or email..."
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              className="pl-10 pr-4 py-2 rounded-lg border-2 border-eco-green dark:border-eco-yellow bg-white dark:bg-gray-900 text-eco-green dark:text-eco-yellow focus:outline-none focus:ring-2 focus:ring-eco-green/20 dark:focus:ring-eco-yellow/20 w-full"
-            />
-          </div>
-        </div>
-        {/* Filtered Users Table */}
-        {search && (
-          <div className="mb-10 overflow-auto max-h-[20vh] rounded-xl shadow">
-            <table className="min-w-full bg-white dark:bg-gray-900 rounded-xl">
-              <thead>
-                <tr>
-                  <th className="px-4 py-2 text-left text-eco-green dark:text-eco-yellow">User ID</th>
-                  <th className="px-4 py-2 text-left text-eco-green dark:text-eco-yellow">Name</th>
-                  <th className="px-4 py-2 text-left text-eco-green dark:text-eco-yellow">Email</th>
-                  <th className="px-4 py-2 text-left text-eco-green dark:text-eco-yellow">Role</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredUsers.map(u => (
-                  <tr key={u.id} className="border-b border-gray-200 dark:border-gray-700 hover:bg-eco-green/5 dark:hover:bg-eco-yellow/5 transition">
-                    <td className="px-4 py-2 text-xs text-gray-700 dark:text-gray-300">{u.id}</td>
-                    <td className="px-4 py-2 text-gray-900 dark:text-eco-yellow">{u.name}</td>
-                    <td className="px-4 py-2 text-gray-900 dark:text-eco-yellow">{u.email}</td>
-                    <td className="px-4 py-2 text-gray-900 dark:text-eco-yellow font-bold uppercase">{u.role}</td>
+          {/* Filtered Users Table */}
+          {search && (
+            <div className="mb-10 overflow-auto max-h-[20vh] rounded-xl shadow">
+              <table className="min-w-full bg-white dark:bg-gray-900 rounded-xl">
+                <thead>
+                  <tr>
+                    <th className="px-4 py-2 text-left text-eco-green dark:text-eco-yellow">User ID</th>
+                    <th className="px-4 py-2 text-left text-eco-green dark:text-eco-yellow">Name</th>
+                    <th className="px-4 py-2 text-left text-eco-green dark:text-eco-yellow">Email</th>
+                    <th className="px-4 py-2 text-left text-eco-green dark:text-eco-yellow">Role</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-        {/* Recent Activity Feed */}
-        <div className="mb-10">
-          <h2 className="text-xl font-bold text-eco-green dark:text-eco-yellow mb-4 flex items-center gap-2">
-            <FaTruck /> Recent Activity
-          </h2>
-          <div className="bg-eco-green/10 dark:bg-eco-yellow/10 rounded-xl p-6 shadow flex flex-col gap-3 max-h-[20vh] overflow-auto">
-            {recentActivity.map((a, i) => (
-              <div key={i} className="flex items-center gap-4 animate-pulse">
-                {a.type === 'order' ? (
-                  <FaShoppingBag className="text-eco-green dark:text-eco-yellow text-xl" />
-                ) : (
-                  <FaHandHoldingHeart className="text-eco-green dark:text-eco-yellow text-xl" />
-                )}
-                <div className="flex-1">
-                  <div className="font-bold text-eco-green dark:text-eco-yellow">
-                    {a.type === 'order' ? 'Order' : 'Donation'} {a.id}
-                  </div>
-                  <div className="text-xs text-gray-500 dark:text-gray-300">
-                    User: {a.user} | Value: £{a.value} | {new Date(a.date).toLocaleString()}
+                </thead>
+                <tbody>
+                  {filteredUsers.map(u => (
+                    <tr key={u.id} className="border-b border-gray-200 dark:border-gray-700 hover:bg-eco-green/5 dark:hover:bg-eco-yellow/5 transition">
+                      <td className="px-4 py-2 text-xs text-gray-700 dark:text-gray-300">{u.id}</td>
+                      <td className="px-4 py-2 text-gray-900 dark:text-eco-yellow">{u.name}</td>
+                      <td className="px-4 py-2 text-gray-900 dark:text-eco-yellow">{u.email}</td>
+                      <td className="px-4 py-2 text-gray-900 dark:text-eco-yellow font-bold uppercase">{u.role}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+          {/* Recent Activity Feed */}
+          <div className="mb-10">
+            <h2 className="text-xl font-bold text-eco-green dark:text-eco-yellow mb-4 flex items-center gap-2">
+              <FaTruck /> Recent Activity
+            </h2>
+            <div className="bg-eco-green/10 dark:bg-eco-yellow/10 rounded-xl p-6 shadow flex flex-col gap-3 max-h-[20vh] overflow-auto">
+              {recentActivity.map((a, i) => (
+                <div key={i} className="flex items-center gap-4 animate-pulse">
+                  {a.type === 'order' ? (
+                    <FaShoppingBag className="text-eco-green dark:text-eco-yellow text-xl" />
+                  ) : (
+                    <FaHandHoldingHeart className="text-eco-green dark:text-eco-yellow text-xl" />
+                  )}
+                  <div className="flex-1">
+                    <div className="font-bold text-eco-green dark:text-eco-yellow">
+                      {a.type === 'order' ? 'Order' : 'Donation'} {a.id}
+                    </div>
+                    <div className="text-xs text-gray-500 dark:text-gray-300">
+                      User: {a.user} | Value: £{a.value} | {new Date(a.date).toLocaleString()}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-            {/* Simulated delivery */}
-            <div className="flex items-center gap-4 animate-bounce mt-2">
-              <FaTruck className="text-eco-green dark:text-eco-yellow text-xl" />
-              <div className="flex-1">
-                <div className="font-bold text-eco-green dark:text-eco-yellow">Delivery Status: {deliveryStatus}</div>
-                <div className="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-2 mt-2">
-                  <div className="bg-eco-green dark:bg-eco-yellow h-2 rounded-full" style={{ width: `${deliveryProgress}%`, transition: 'width 0.5s' }}></div>
+              ))}
+              {/* Simulated delivery */}
+              <div className="flex items-center gap-4 animate-bounce mt-2">
+                <FaTruck className="text-eco-green dark:text-eco-yellow text-xl" />
+                <div className="flex-1">
+                  <div className="font-bold text-eco-green dark:text-eco-yellow">Delivery Status: {deliveryStatus}</div>
+                  <div className="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-2 mt-2">
+                    <div className="bg-eco-green dark:bg-eco-yellow h-2 rounded-full" style={{ width: `${deliveryProgress}%`, transition: 'width 0.5s' }}></div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-        {/* Orders/Donations Chart */}
-        <div className="mb-10">
-          <h2 className="text-xl font-bold text-eco-green dark:text-eco-yellow mb-4 flex items-center gap-2">
-            <FaLeaf /> Orders & Donations (Last 7 Days)
-          </h2>
-          <div className="bg-eco-green/10 dark:bg-eco-yellow/10 rounded-xl p-6 shadow">
-            <ResponsiveContainer width="100%" height={220}>
-              <LineChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="day" tick={{ fill: '#1A3C34' }} />
-                <YAxis tick={{ fill: '#1A3C34' }} />
-                <Tooltip />
-                <Line type="monotone" dataKey="orders" stroke="#1A3C34" strokeWidth={3} dot={{ r: 5 }} name="Orders" />
-                <Line type="monotone" dataKey="donations" stroke="#E3B505" strokeWidth={3} dot={{ r: 5 }} name="Donations" />
-              </LineChart>
-            </ResponsiveContainer>
+          {/* Orders/Donations Chart */}
+          <div className="mb-10">
+            <h2 className="text-xl font-bold text-eco-green dark:text-eco-yellow mb-4 flex items-center gap-2">
+              <FaLeaf /> Orders & Donations (Last 7 Days)
+            </h2>
+            <div className="bg-eco-green/10 dark:bg-eco-yellow/10 rounded-xl p-6 shadow">
+              <ResponsiveContainer width="100%" height={220}>
+                <LineChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="day" tick={{ fill: '#1A3C34' }} />
+                  <YAxis tick={{ fill: '#1A3C34' }} />
+                  <Tooltip />
+                  <Line type="monotone" dataKey="orders" stroke="#1A3C34" strokeWidth={3} dot={{ r: 5 }} name="Orders" />
+                  <Line type="monotone" dataKey="donations" stroke="#E3B505" strokeWidth={3} dot={{ r: 5 }} name="Donations" />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
           </div>
-        </div>
-        {/* Live Deliveries Animation (Map) */}
-        <div className="mb-10">
-          <h2 className="text-xl font-bold text-eco-green dark:text-eco-yellow mb-4 flex items-center gap-2">
-            <FaTruck /> Live Deliveries
-          </h2>
-          <div className="flex justify-center">
-            <svg width={MAP_WIDTH} height={MAP_HEIGHT} className="rounded-xl shadow bg-eco-green/10 dark:bg-eco-yellow/10" style={{ minWidth: 350 }}>
-              {/* Draw the circular route as a single closed polyline */}
-              <polyline
-                points={[
-                  [WAREHOUSE.x, WAREHOUSE.y],
-                  ...STOPS.map(p => [p.x, p.y]),
-                  [WAREHOUSE.x, WAREHOUSE.y]
-                ].map(([x, y]) => `${x},${y}`).join(' ')}
-                fill="none"
-                stroke="#E3B505"
-                strokeWidth={4}
-                strokeDasharray="8 6"
-              />
-              
-              {/* Warehouse */}
-              <circle cx={WAREHOUSE.x} cy={WAREHOUSE.y} r={18} fill="#1A3C34" />
-              <text x={WAREHOUSE.x} y={WAREHOUSE.y + 5} textAnchor="middle" fill="#fff" fontSize={14} fontWeight="bold">WH</text>
-              
-              {/* Delivery Stops (Houses) */}
-              {STOPS.map((loc, i) => (
-                <g key={i}>
-                  <text x={loc.x} y={loc.y} fontSize={24} textAnchor="middle" alignmentBaseline="middle">🏠</text>
-                  <text x={loc.x} y={loc.y + 30} textAnchor="middle" fill="#1A3C34" fontSize={12} fontWeight="bold">
-                    Stop {i + 1}
-                  </text>
-                </g>
-              ))}
-              
-              {/* Trucks */}
-              {deliveries.map((d, idx) => {
-                if (!d.visible) return null;
+          {/* Live Deliveries Animation (Map) */}
+          <div className="mb-10">
+            <h2 className="text-xl font-bold text-eco-green dark:text-eco-yellow mb-4 flex items-center gap-2">
+              <FaTruck /> Live Deliveries
+            </h2>
+            <div className="flex justify-center">
+              <svg width={MAP_WIDTH} height={MAP_HEIGHT} className="rounded-xl shadow bg-eco-green/10 dark:bg-eco-yellow/10" style={{ minWidth: 350 }}>
+                {/* Draw the circular route as a single closed polyline */}
+                <polyline
+                  points={[
+                    [WAREHOUSE.x, WAREHOUSE.y],
+                    ...STOPS.map(p => [p.x, p.y]),
+                    [WAREHOUSE.x, WAREHOUSE.y]
+                  ].map(([x, y]) => `${x},${y}`).join(' ')}
+                  fill="none"
+                  stroke="#E3B505"
+                  strokeWidth={4}
+                  strokeDasharray="8 6"
+                />
                 
-                const { route, seg, t } = d;
-                const p1 = route[seg];
-                const p2 = route[seg + 1];
-                const x = lerp(p1.x, p2.x, t);
-                const y = lerp(p1.y, p2.y, t);
-                const angle = getAngle(p1.x, p1.y, p2.x, p2.y);
-                const flip = Math.abs(angle) > Math.PI / 2;
+                {/* Warehouse */}
+                <circle cx={WAREHOUSE.x} cy={WAREHOUSE.y} r={18} fill="#1A3C34" />
+                <text x={WAREHOUSE.x} y={WAREHOUSE.y + 5} textAnchor="middle" fill="#fff" fontSize={14} fontWeight="bold">WH</text>
                 
-                return (
-                  <g key={d.id}>
-                    {/* Truck icon */}
-                    <g transform={`translate(${x},${y}) scale(${flip ? -1 : 1},1)`}>
-                      <text x={0} y={0} fontSize={32} textAnchor="middle" alignmentBaseline="middle">🚚</text>
-                    </g>
-                    {/* Info card above truck */}
-                    <g>
-                      <rect x={x - 60} y={y - 55} width={120} height={38} rx={10} fill="#fff" opacity={0.95} />
-                      <text x={x} y={y - 40} textAnchor="middle" fill="#1A3C34" fontSize={13} fontWeight="bold">
-                        Order: {d.order.id}
-                      </text>
-                      <text x={x} y={y - 25} textAnchor="middle" fill="#E3B505" fontSize={12}>
-                        {d.status}
-                      </text>
-                    </g>
+                {/* Delivery Stops (Houses) */}
+                {STOPS.map((loc, i) => (
+                  <g key={i}>
+                    <text x={loc.x} y={loc.y} fontSize={24} textAnchor="middle" alignmentBaseline="middle">🏠</text>
+                    <text x={loc.x} y={loc.y + 30} textAnchor="middle" fill="#1A3C34" fontSize={12} fontWeight="bold">
+                      Stop {i + 1}
+                    </text>
                   </g>
-                );
-              })}
-            </svg>
+                ))}
+                
+                {/* Trucks */}
+                {deliveries.map((d, idx) => {
+                  if (!d.visible) return null;
+                  
+                  const { route, seg, t } = d;
+                  const p1 = route[seg];
+                  const p2 = route[seg + 1];
+                  const x = lerp(p1.x, p2.x, t);
+                  const y = lerp(p1.y, p2.y, t);
+                  const angle = getAngle(p1.x, p1.y, p2.x, p2.y);
+                  const flip = Math.abs(angle) > Math.PI / 2;
+                  
+                  return (
+                    <g key={d.id}>
+                      {/* Truck icon */}
+                      <g transform={`translate(${x},${y}) scale(${flip ? -1 : 1},1)`}>
+                        <text x={0} y={0} fontSize={32} textAnchor="middle" alignmentBaseline="middle">🚚</text>
+                      </g>
+                      {/* Info card above truck */}
+                      <g>
+                        <rect x={x - 60} y={y - 55} width={120} height={38} rx={10} fill="#fff" opacity={0.95} />
+                        <text x={x} y={y - 40} textAnchor="middle" fill="#1A3C34" fontSize={13} fontWeight="bold">
+                          Order: {d.order.id}
+                        </text>
+                        <text x={x} y={y - 25} textAnchor="middle" fill="#E3B505" fontSize={12}>
+                          {d.status}
+                        </text>
+                      </g>
+                    </g>
+                  );
+                })}
+              </svg>
+            </div>
           </div>
-        </div>
-      </motion.div>
+        </motion.div>
+      </div>
       <AdminFooter />
-    </div>
+    </>
   );
 };
 

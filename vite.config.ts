@@ -15,18 +15,11 @@ export default defineConfig({
     outDir: 'dist',
     assetsDir: 'assets',
     minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true,
-        drop_debugger: true
-      }
-    },
     rollupOptions: {
       output: {
         manualChunks: {
           'react-vendor': ['react', 'react-dom'],
-          'router-vendor': ['react-router-dom'],
-          'three-vendor': ['three', '@react-three/fiber', '@react-three/drei']
+          'router-vendor': ['react-router-dom']
         }
       }
     }

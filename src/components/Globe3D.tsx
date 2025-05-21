@@ -1,36 +1,116 @@
-import React, { useRef } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Stars, useTexture } from '@react-three/drei';
+import React, { useRef, useEffect, useState } from 'react';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { Sphere, PerspectiveCamera, useTexture } from '@react-three/drei';
+import { useNavigate, useLocation } from 'react-router-dom';
+import * as THREE from 'three';
 
-function Earth() {
-  const mesh = useRef<any>();
-  const colorMap = useTexture('https://threejs.org/examples/textures/land_ocean_ice_cloud_2048.jpg');
+const GlobeMesh: React.FC = () => {
+  const meshRef = useRef<THREE.Mesh>(null);
+  const colorMap = useTexture('/assets/earth-blue-marble.jpg');
+  const { gl } = useThree();
 
-  // Auto-rotate
+  useEffect(() => {
+    const handleContextLost = (event: Event) => {
+      event.preventDefault();
+      console.log('WebGL context lost, attempting to recover...');
+    };
+
+    const handleContextRestored = () => {
+      console.log('WebGL context restored');
+      if (meshRef.current) {
+        meshRef.current.material.needsUpdate = true;
+      }
+    };
+
+    gl.domElement.addEventListener('webglcontextlost', handleContextLost);
+    gl.domElement.addEventListener('webglcontextrestored', handleContextRestored);
+
+    return () => {
+      gl.domElement.removeEventListener('webglcontextlost', handleContextLost);
+      gl.domElement.removeEventListener('webglcontextrestored', handleContextRestored);
+    };
+  }, [gl]);
+
   useFrame(() => {
-    if (mesh.current) {
-      mesh.current.rotation.y += 0.003;
+    if (meshRef.current) {
+      meshRef.current.rotation.y += 0.0015;
     }
   });
 
   return (
-    <mesh ref={mesh}>
-      <sphereGeometry args={[1, 64, 64]} />
+    <Sphere ref={meshRef} args={[1, 64, 64]} castShadow receiveShadow>
       <meshStandardMaterial map={colorMap} />
-    </mesh>
+      </Sphere>
   );
-}
+};
 
-const Globe3D: React.FC<{ width?: number; height?: number }> = ({ width = 200, height = 200 }) => {
+const Globe3D: React.FC<{ className?: string }> = ({ className = '' }) => {
+  const [isVisible, setIsVisible] = useState(true);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      setIsVisible(!document.hidden);
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
+
+  const handleClick = () => {
+    navigate('/game-arcade');
+  };
+
+  // Only show the tooltip on dashboard pages
+  const showTooltip = location.pathname === '/dashboard' || location.pathname === '/admin' || location.pathname === '/user-dashboard';
+
   return (
-    <div style={{ width, height }}>
-      <Canvas camera={{ position: [0, 0, 2.5], fov: 50 }}>
-        <ambientLight intensity={0.7} />
-        <directionalLight position={[5, 3, 5]} intensity={1} />
-        <Earth />
-        <Stars radius={10} depth={50} count={1000} factor={2} fade />
-        {/* No OrbitControls for non-interactive */}
-      </Canvas>
+    <div
+      className={`flex flex-col items-center justify-center w-full py-6 md:py-10 ${className}`}
+      style={{ minHeight: 340 }}
+    >
+      <div
+        className="relative rounded-full overflow-hidden aspect-square"
+        style={{ width: 300, height: 300, cursor: 'pointer', boxShadow: '0 0 32px #0004' }}
+        onClick={handleClick}
+        tabIndex={0}
+        role="button"
+        aria-label="Open Game Arcade"
+        onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') handleClick(); }}
+      >
+        {isVisible && (
+          <Canvas
+            shadows
+            dpr={[1, 1.5]}
+            style={{ width: '100%', height: '100%' }}
+            gl={{
+              powerPreference: 'high-performance',
+              antialias: true,
+              stencil: false,
+              depth: true,
+              alpha: true,
+              preserveDrawingBuffer: false,
+              failIfMajorPerformanceCaveat: true,
+            }}
+          >
+            <PerspectiveCamera makeDefault position={[0, 0, 3]} />
+            <ambientLight intensity={0.6} />
+            <directionalLight position={[5, 5, 5]} intensity={1.1} castShadow />
+            <GlobeMesh />
+          </Canvas>
+        )}
+        {/* Optional: Glow effect */}
+        <div className="absolute inset-0 rounded-full pointer-events-none" style={{ boxShadow: '0 0 40px 10px #eab30833, 0 0 0 8px #1a223355' }} />
+      </div>
+      {showTooltip && (
+        <div className="mt-3 animate-bounce text-eco-yellow text-lg font-bold bg-black/60 px-4 py-2 rounded-full shadow-lg border border-eco-yellow/60 select-none" style={{ letterSpacing: 0.5 }}>
+          🎮 Click the globe for games!
+        </div>
+      )}
     </div>
   );
 };

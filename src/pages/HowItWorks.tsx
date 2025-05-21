@@ -1,28 +1,67 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { motion } from 'framer-motion';
+import Navbar from '../components/Navbar';
 
 const steps = [
   {
-    icon: '/assets/images/farm-icon.svg',
-    title: 'Source',
-    desc: 'We partner with local farms and producers to identify surplus food.'
+    title: 'Browse Deals',
+    description: 'Explore our selection of discounted food items from local businesses.',
+    icon: (
+      <svg
+        className="h-12 w-12 text-green-500"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+        />
+      </svg>
+    ),
   },
   {
-    icon: '/assets/images/grocery-icon.svg',
-    title: 'Collect',
-    desc: 'Our team collects surplus from groceries, restaurants, and partners.'
+    title: 'Place Order',
+    description: 'Select your items and complete your purchase securely online.',
+    icon: (
+      <svg
+        className="h-12 w-12 text-green-500"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+        />
+      </svg>
+    ),
   },
   {
-    icon: '/assets/images/restaurant-icon.svg',
-    title: 'Distribute',
-    desc: 'We sort and distribute food to communities and through our shop.'
+    title: 'Pick Up',
+    description: 'Collect your order from the store at your convenience.',
+    icon: (
+      <svg
+        className="h-12 w-12 text-green-500"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
+        />
+      </svg>
+    ),
   },
-  {
-    icon: '/assets/images/volunteer-icon.svg',
-    title: 'Impact',
-    desc: 'Volunteers and partners help us reduce waste and feed people.'
-  }
 ];
 
 const partners = [
@@ -72,134 +111,245 @@ const involvement = [
     icon: '🤝',
     title: 'Partner',
     desc: 'Are you a business or charity? Join our network and make an impact.',
-    cta: '/join-us',
+    cta: '/become-partner',
     ctaText: 'Become a Partner'
   },
   {
     icon: '📢',
     title: 'Spread the Word',
     desc: 'Share our mission with friends, family, and on social media.',
-    cta: '/learn-more',
+    cta: '/about',
     ctaText: 'Learn More'
   }
 ];
 
-const HowItWorks: React.FC = () => {
+interface HowItWorksProps {
+  darkMode: boolean;
+  toggleDarkMode: () => void;
+}
+
+const HowItWorks: React.FC<HowItWorksProps> = ({ darkMode, toggleDarkMode }) => {
   const { user } = useAuth();
+
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
-      {/* Stat Hero Section */}
-      <section className="relative flex items-center justify-center min-h-[40vh] bg-gradient-to-br from-eco-green via-eco-green/80 to-eco-green/60 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
-        <div className="absolute inset-0 bg-[url('/assets/gallery2.jpeg')] bg-cover bg-center opacity-40 mix-blend-multiply"></div>
-        <div className="relative z-10 max-w-2xl mx-auto text-center py-16 px-4">
-          <div className="text-6xl md:text-7xl font-bold text-eco-yellow mb-2 font-playfair drop-shadow">1/3</div>
-          <div className="text-xl md:text-2xl text-white dark:text-eco-yellow font-bold mb-4">of all food produced is wasted</div>
-          <p className="text-lg text-white/90 dark:text-eco-yellow/90 mb-6">Millions of tonnes of food are lost every year while many go hungry. Eco Waste Hub is changing that—one meal at a time.</p>
-          <Link to="/donate" className="bg-eco-yellow text-eco-green font-bold px-8 py-3 rounded-full shadow hover:bg-yellow-300 transition">Help Us Change This</Link>
+    <>
+      <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 pt-20">
+      {/* Hero Section */}
+        <section className="bg-eco-green dark:bg-gray-900 py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <motion.h1 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="text-4xl font-bold text-white mb-6"
+            >
+            How It Works
+            </motion.h1>
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="text-xl text-white/90 max-w-3xl mx-auto"
+            >
+            We&apos;re making it easy to reduce food waste and save money. Here&apos;s how our platform works.
+            </motion.p>
         </div>
       </section>
 
-      {/* Visual Stepper/Timeline */}
-      <section className="py-14 bg-white dark:bg-gray-900 transition-colors duration-300">
-        <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold font-playfair text-eco-green dark:text-eco-yellow text-center mb-10">How It Works</h2>
-          <div className="flex flex-row justify-center items-stretch gap-6 overflow-x-auto pb-4">
-            {steps.map((step, idx) => (
-              <div key={step.title} className="flex-1 min-w-[220px] flex flex-col items-center text-center px-2 md:px-6 relative">
-                <div className="w-16 h-16 flex items-center justify-center bg-eco-green/10 dark:bg-eco-yellow/20 border border-eco-green/30 dark:border-eco-yellow/60 rounded-full mb-2">
-                  <img src={step.icon} alt={step.title} className="w-10 h-10 dark:invert dark:brightness-150" />
-                </div>
-                <div className="text-lg font-bold text-eco-green dark:text-eco-yellow mb-1">{step.title}</div>
-                <div className="text-gray-600 dark:text-gray-200 text-sm mb-2">{step.desc}</div>
-                {idx < steps.length - 1 && (
-                  <div className="hidden md:block absolute right-0 top-1/2 transform translate-x-1/2 -translate-y-1/2 w-12 h-1 bg-eco-green/20 dark:bg-gray-700/40"></div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Video Section */}
-      <section className="py-12 bg-gray-50 dark:bg-gray-800 transition-colors duration-300">
-        <div className="max-w-3xl mx-auto px-4 text-center">
-          <h2 className="text-2xl md:text-3xl font-bold font-playfair text-eco-green dark:text-eco-yellow mb-6">See the Journey</h2>
-          <div className="relative w-full max-w-2xl mx-auto">
-            <video controls poster="/assets/gallery2-thumb.jpeg" className="w-full rounded-xl shadow-lg">
-              <source src="/assets/videos/how-does-it-work.mp4" type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-          </div>
-        </div>
-      </section>
-
-      {/* Partners Section */}
-      <section className="py-14 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 transition-colors duration-300">
-        <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-2xl md:text-3xl font-bold font-playfair text-eco-green dark:text-eco-yellow text-center mb-8">Our Partners</h2>
-          <div className="flex flex-wrap justify-center gap-8">
-            {partners.map((p) => (
-              <div key={p.name} className="flex flex-col items-center">
-                <div className="w-16 h-16 flex items-center justify-center bg-eco-green/10 dark:bg-eco-yellow/20 border border-eco-green/30 dark:border-eco-yellow/60 rounded-full mb-2">
-                  <img src={p.icon} alt={p.name} className="w-10 h-10 dark:invert dark:brightness-150" />
-                </div>
-                <div className="text-lg font-semibold text-eco-green dark:text-eco-yellow">{p.name}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials Section */}
-      <section className="py-14 bg-gray-50 dark:bg-gray-800 transition-colors duration-300">
-        <div className="max-w-5xl mx-auto px-4">
-          <h2 className="text-2xl md:text-3xl font-bold font-playfair text-eco-green dark:text-eco-yellow text-center mb-8">What People Are Saying</h2>
+      {/* Steps Section */}
+      <section className="py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((t) => (
-              <div key={t.name} className="bg-white dark:bg-gray-900 rounded-xl shadow p-6 flex flex-col items-center text-center">
-                <img src={t.icon} alt={t.name} className="w-16 h-16 object-cover rounded-full mb-2" />
-                <div className="italic text-gray-700 dark:text-gray-200 mb-3">"{t.quote}"</div>
-                <div className="font-bold text-eco-green dark:text-eco-yellow">{t.name}</div>
-                <div className="text-sm text-gray-500 dark:text-gray-300">{t.role}</div>
-              </div>
+            {steps.map((step, index) => (
+                <motion.div
+                key={step.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.2 }}
+                  className="bg-white dark:bg-gray-900 rounded-lg p-6 shadow-lg hover:shadow-xl transition-shadow duration-300"
+              >
+                <div className="flex items-center justify-center mb-4">
+                    <div className="text-eco-yellow">
+                  {step.icon}
+                </div>
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-eco-yellow mb-2 text-center">
+                  {index + 1}. {step.title}
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 text-center">
+                  {step.description}
+                </p>
+                </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Get Involved Section */}
-      {!user && (
-        <section className="py-14 bg-white dark:bg-gray-900 transition-colors duration-300">
-          <div className="max-w-5xl mx-auto px-4">
-            <h2 className="text-2xl md:text-3xl font-bold font-playfair text-eco-green dark:text-eco-yellow text-center mb-8">Get Involved</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
-              {involvement.map((item) => (
-                <div key={item.title} className="bg-gray-50 dark:bg-gray-800 rounded-xl shadow p-6 flex flex-col items-center text-center hover:shadow-lg transition">
-                  <div className="text-4xl mb-3">{item.icon}</div>
-                  <div className="text-lg font-bold text-eco-green dark:text-eco-yellow mb-1">{item.title}</div>
-                  <div className="text-gray-600 dark:text-gray-200 mb-2">{item.desc}</div>
-                  <Link to={item.cta} className="mt-2 inline-block bg-eco-yellow text-eco-green font-bold px-4 py-2 rounded-full shadow hover:bg-yellow-300 transition text-sm">{item.ctaText}</Link>
-                </div>
+      {/* Benefits Section */}
+        <section className="py-20 bg-white dark:bg-gray-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.h2 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="text-3xl font-bold text-eco-green dark:text-white mb-12 text-center"
+            >
+            Benefits of Using Eco Waste Hub
+            </motion.h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[
+                {
+                  title: 'Save Money',
+                  description: 'Get great deals on quality food items while helping reduce waste in your community.'
+                },
+                {
+                  title: 'Reduce Waste',
+                  description: 'Help prevent food waste by connecting with local businesses and making sustainable choices.'
+                },
+                {
+                  title: 'Support Local',
+                  description: 'Support local businesses while contributing to a more sustainable future.'
+                }
+              ].map((benefit, index) => (
+                <motion.div
+                  key={benefit.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.2 }}
+                  className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 hover:shadow-lg transition-shadow duration-300"
+                >
+                  <h3 className="text-xl font-semibold text-eco-green dark:text-eco-yellow mb-2">
+                    {benefit.title}
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300">
+                    {benefit.description}
+              </p>
+                </motion.div>
               ))}
             </div>
           </div>
         </section>
-      )}
 
-      {/* Final CTA Section */}
-      <section className="py-16 bg-eco-green dark:bg-gray-900 transition-colors duration-300">
-        <div className="max-w-3xl mx-auto text-center px-4">
-          <h2 className="text-3xl md:text-4xl font-bold font-playfair text-white dark:text-eco-yellow mb-6">Ready to Make a Difference?</h2>
-          <p className="text-lg text-white/90 dark:text-eco-yellow/90 mb-8">Join Eco Waste Hub and help us rescue food, support communities, and build a more sustainable future.</p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            {!user && (
-              <Link to="/join-us" className="bg-eco-yellow text-eco-green font-bold px-8 py-3 rounded-full shadow hover:bg-yellow-300 transition">Join Us</Link>
-            )}
-            <Link to="/donate" className="bg-white/80 dark:bg-gray-800 text-eco-green dark:text-eco-yellow font-bold px-8 py-3 rounded-full shadow hover:bg-white dark:hover:bg-gray-700 transition border border-eco-green">Donate</Link>
+        {/* Testimonials Section */}
+        <section className="py-20 bg-gray-50 dark:bg-gray-950">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.h2 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="text-3xl font-bold text-eco-green dark:text-white mb-12 text-center"
+            >
+              What Our Community Says
+            </motion.h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {testimonials.map((testimonial, index) => (
+                <motion.div
+                  key={testimonial.name}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.2 }}
+                  className="bg-white dark:bg-gray-900 rounded-lg p-6 shadow-lg"
+                >
+                  <div className="flex items-center mb-4">
+                    <img
+                      src={testimonial.icon}
+                      alt={testimonial.name}
+                      className="w-12 h-12 rounded-full object-cover mr-4 border-2 border-eco-yellow"
+                    />
+                    <div>
+                      <h4 className="text-lg font-semibold text-eco-green dark:text-eco-yellow">
+                        {testimonial.name}
+                      </h4>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        {testimonial.role}
+                  </p>
+                </div>
+                  </div>
+                  <p className="text-gray-600 dark:text-gray-300 italic">
+                    "{testimonial.quote}"
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Get Involved Section */}
+        <section className="py-20 bg-white dark:bg-gray-900">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.h2 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="text-3xl font-bold text-eco-green dark:text-white mb-12 text-center"
+            >
+              Get Involved
+            </motion.h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {involvement
+                .filter(item => !(item.title === 'Volunteer' && user))
+                .map((item, index) => (
+                <motion.div
+                  key={item.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.2 }}
+                  className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 text-center"
+                >
+                  <div className="text-4xl mb-4">{item.icon}</div>
+                  <h3 className="text-xl font-semibold text-eco-green dark:text-eco-yellow mb-2">
+                    {item.title}
+              </h3>
+                  <p className="text-gray-600 dark:text-gray-300 mb-4">
+                    {item.desc}
+                  </p>
+                  <Link
+                    to={item.cta}
+                    className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-eco-green hover:bg-eco-green/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-eco-green"
+                  >
+                    {item.ctaText}
+                  </Link>
+                </motion.div>
+              ))}
           </div>
         </div>
       </section>
+
+      {/* CTA Section */}
+        <section className="py-20 bg-eco-green dark:bg-gray-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <motion.h2 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="text-3xl font-bold text-white mb-8"
+            >
+            Ready to Get Started?
+            </motion.h2>
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="flex flex-col sm:flex-row justify-center gap-4"
+            >
+            <Link
+                to={user ? "/shop" : "/signup"}
+                className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-eco-green bg-eco-yellow hover:bg-eco-yellow/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-eco-yellow"
+            >
+                {user ? "Start Shopping" : "Sign Up Now"}
+            </Link>
+            <Link
+              to="/contact"
+                className="inline-flex items-center justify-center px-6 py-3 border border-eco-yellow text-base font-medium rounded-md text-eco-yellow hover:bg-eco-yellow/10 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-eco-yellow"
+            >
+              Contact Us
+            </Link>
+            </motion.div>
+        </div>
+      </section>
     </div>
+    </>
   );
 };
 

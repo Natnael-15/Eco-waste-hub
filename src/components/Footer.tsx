@@ -12,9 +12,9 @@ const Footer = () => (
         </div>
         <p className="text-sm text-white/80 dark:text-eco-yellow/80 mb-4">Your eco-marketplace for surplus food and sustainable groceries. Join us in reducing food waste and supporting communities.</p>
         <div className="flex gap-3 mt-2">
-          <a href="https://instagram.com/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="hover:text-eco-yellow"><FaInstagram size={22} /></a>
-          <a href="https://twitter.com/" target="_blank" rel="noopener noreferrer" aria-label="Twitter" className="hover:text-eco-yellow"><FaTwitter size={22} /></a>
-          <a href="https://facebook.com/" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="hover:text-eco-yellow"><FaFacebook size={22} /></a>
+          <Link to="/instagram" aria-label="Instagram" className="hover:text-eco-yellow"><FaInstagram size={22} /></Link>
+          <Link to="/twitter" aria-label="Twitter" className="hover:text-eco-yellow"><FaTwitter size={22} /></Link>
+          <Link to="/facebook" aria-label="Facebook" className="hover:text-eco-yellow"><FaFacebook size={22} /></Link>
         </div>
       </div>
       {/* Quick Links */}
