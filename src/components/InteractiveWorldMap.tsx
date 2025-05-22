@@ -69,7 +69,11 @@ function CountryBillboardMarkers({ onHover, onClick, hovered }) {
 
 function Globe({ onHover, onClick, hovered }) {
   const globeRef = useRef();
-  const texture = useTexture('/assets/earth-blue-marble.jpg');
+  const texture = useTexture('/assets/earth-blue-marble.jpg', (texture) => {
+    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+  }, (error) => {
+    console.warn('Error loading earth texture:', error);
+  });
   return (
     <group>
       <mesh ref={globeRef}>

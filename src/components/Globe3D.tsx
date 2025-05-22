@@ -6,7 +6,11 @@ import * as THREE from 'three';
 
 const GlobeMesh: React.FC = () => {
   const meshRef = useRef<THREE.Mesh>(null);
-  const colorMap = useTexture('/assets/earth-blue-marble.jpg');
+  const colorMap = useTexture('/assets/earth-blue-marble.jpg', (texture) => {
+    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+  }, (error) => {
+    console.warn('Error loading earth texture:', error);
+  });
   const { gl } = useThree();
 
   useEffect(() => {
