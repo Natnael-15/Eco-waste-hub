@@ -1,6 +1,6 @@
 import React, { useRef, useState, Suspense, useEffect } from 'react';
-import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Stars, useTexture, Html } from '@react-three/drei';
+import { Canvas, useLoader } from '@react-three/fiber';
+import { OrbitControls, Stars, Html } from '@react-three/drei';
 import * as THREE from 'three';
 
 // Country data with fun facts
@@ -69,25 +69,7 @@ function CountryBillboardMarkers({ onHover, onClick, hovered }) {
 
 function Globe({ onHover, onClick, hovered }) {
   const globeRef = useRef();
-  const [texture, setTexture] = useState(null);
-
-  useEffect(() => {
-    const loader = new THREE.TextureLoader();
-    loader.load(
-      '/assets/earth-blue-marble.jpg',
-      (loadedTexture) => {
-        loadedTexture.wrapS = loadedTexture.wrapT = THREE.RepeatWrapping;
-        setTexture(loadedTexture);
-      },
-      undefined,
-      (error) => {
-        console.warn('Error loading earth texture:', error);
-        // Create a fallback texture
-        const fallbackTexture = new THREE.TextureLoader().load('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==');
-        setTexture(fallbackTexture);
-      }
-    );
-  }, []);
+  const texture = useLoader(THREE.TextureLoader, '/assets/earth-blue-marble.jpg');
 
   return (
     <group>
