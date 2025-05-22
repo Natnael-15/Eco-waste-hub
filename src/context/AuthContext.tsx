@@ -123,32 +123,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const logout = async (onLoggedOut?: () => void) => {
+  const logout = async () => {
     try {
-      // 1. Set loggedOut state to prevent session checks
       setLoggedOut(true);
-      
-      // 2. Sign out from Supabase
       const { error: signOutError } = await supabase.auth.signOut();
       if (signOutError) throw signOutError;
-      
-      // 3. Clear all local state
       setUser(null);
       setProfile(null);
-      
-      // 4. Clear all auth-related storage
       localStorage.removeItem('userName');
       Object.keys(localStorage).forEach(key => {
         if (key.startsWith('sb-') || key.includes('supabase')) {
           localStorage.removeItem(key);
         }
       });
-      
-      // 5. Call the callback if provided
-      if (onLoggedOut) onLoggedOut();
     } catch (error) {
       console.error('Error during logout:', error);
-      // Reset loggedOut state if logout fails
       setLoggedOut(false);
       throw error;
     }

@@ -23,7 +23,8 @@ const Navbar: React.FC = () => {
     try {
       setShowGoodbye(true);
       await new Promise(resolve => setTimeout(resolve, 2000));
-      await logout(() => navigate('/login', { replace: true }));
+      await logout();
+      navigate('/login', { replace: true });
     } catch (error) {
       console.error('Error signing out:', error);
       setShowGoodbye(false);

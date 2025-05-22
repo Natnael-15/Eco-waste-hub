@@ -26,7 +26,8 @@ const AdminNavbar: React.FC = () => {
     try {
       setShowGoodbye(true);
       await new Promise(resolve => setTimeout(resolve, 2000));
-      await logout(() => navigate('/admin-login', { replace: true }));
+      await logout();
+      navigate('/admin-login', { replace: true });
     } catch (error) {
       console.error('Error logging out:', error);
       setShowGoodbye(false);

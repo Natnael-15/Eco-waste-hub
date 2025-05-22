@@ -85,7 +85,8 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ darkMode, toggleDarkMode 
     try {
       setShowGoodbye(true);
       await new Promise(resolve => setTimeout(resolve, 2000));
-      await logout(() => navigate('/login', { replace: true }));
+      await logout();
+      navigate('/login');
     } catch (error) {
       console.error('Error during logout:', error);
       setShowGoodbye(false);
