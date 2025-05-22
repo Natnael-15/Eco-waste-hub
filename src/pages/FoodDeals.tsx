@@ -57,7 +57,7 @@ const FoodDeals: React.FC<FoodDealsProps> = ({ darkMode, toggleDarkMode }) => {
           rating: product.rating ? Number(product.rating) : 0,
           discountPercent: 30,
           originalPrice: product.price ? Number(product.price) : 0,
-          price: product.price ? Number(product.price) * 0.7 : 0,
+          finalPrice: product.price ? Number(product.price) * 0.7 : 0,
           tags: Array.isArray(product.tags) ? product.tags : [],
         }));
         setDeals(normalized);
