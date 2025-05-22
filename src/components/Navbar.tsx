@@ -4,18 +4,15 @@ import { FaMoon, FaSun, FaRecycle, FaLeaf, FaChartLine, FaTrophy, FaUserCircle }
 import { useAuth } from '../context/AuthContext';
 import GoodbyeModal from './GoodbyeModal';
 import { ShoppingCart, User, Menu, X } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 
-interface NavbarProps {
-  darkMode: boolean;
-  toggleDarkMode: () => void;
-}
-
-const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode }) => {
+const Navbar: React.FC = () => {
   const [showGoodbye, setShowGoodbye] = React.useState(false);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const isLoggedIn = !!user;
+  const { darkMode, toggleDarkMode } = useTheme();
 
   // Hide Navbar on admin and admin-login routes
   if (location.pathname.startsWith('/admin')) {

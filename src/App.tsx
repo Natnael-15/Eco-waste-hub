@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
+import { ThemeProvider, useTheme } from './context/ThemeContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -34,7 +35,6 @@ import AdminSettings from './pages/AdminSettings';
 import AdminAdRevenue from './pages/AdminAdRevenue';
 import './App.css';
 import { supabase } from './lib/supabase';
-import { AdminThemeProvider } from './context/AdminThemeContext';
 
 const AppRoutes: React.FC<{ darkMode: boolean, toggleDarkMode: () => void }> = ({ darkMode, toggleDarkMode }) => {
   const location = useLocation();
@@ -45,16 +45,14 @@ const AppRoutes: React.FC<{ darkMode: boolean, toggleDarkMode: () => void }> = (
       {!hideNavAndFooter && <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />}
       <main className="flex-grow">
         {isAdminRoute ? (
-          <AdminThemeProvider>
-            <Routes>
-              <Route path="/admin" element={<AdminDashboard />} />
-              <Route path="/admin/orders" element={<AdminOrders />} />
-              <Route path="/admin/donations" element={<AdminDonations />} />
-              <Route path="/admin/users" element={<AdminUsers />} />
-              <Route path="/admin/settings" element={<AdminSettings />} />
-              <Route path="/admin/ad-revenue" element={<AdminAdRevenue />} />
-            </Routes>
-          </AdminThemeProvider>
+          <Routes>
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/orders" element={<AdminOrders />} />
+            <Route path="/admin/donations" element={<AdminDonations />} />
+            <Route path="/admin/users" element={<AdminUsers />} />
+            <Route path="/admin/settings" element={<AdminSettings />} />
+            <Route path="/admin/ad-revenue" element={<AdminAdRevenue />} />
+          </Routes>
         ) : (
           <Routes>
             <Route path="/" element={<Home />} />
@@ -93,8 +91,19 @@ const AppRoutes: React.FC<{ darkMode: boolean, toggleDarkMode: () => void }> = (
           </Routes>
         )}
       </main>
-      {!(location.pathname.startsWith('/admin')) && !hideNavAndFooter && <Footer />}
+      {!(location.pathname.startsWith('/admin')) && !hideNavAndFooter && <Footer darkMode={darkMode} />}
     </div>
+  );
+};
+
+const AppContent: React.FC = () => {
+  const { darkMode, toggleDarkMode } = useTheme();
+  return (
+    <>
+      <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+      <AppRoutes darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+      <Footer darkMode={darkMode} />
+    </>
   );
 };
 
@@ -145,13 +154,15 @@ const App: React.FC = () => {
   const toggleDarkMode = () => setDarkMode(dm => !dm);
 
   return (
-    <Router>
-      <AuthProvider>
-        <CartProvider>
-          <AppRoutes darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
-        </CartProvider>
-      </AuthProvider>
-    </Router>
+    <ThemeProvider>
+      <Router>
+        <AuthProvider>
+          <CartProvider>
+            <AppContent />
+          </CartProvider>
+        </AuthProvider>
+      </Router>
+    </ThemeProvider>
   );
 };
 

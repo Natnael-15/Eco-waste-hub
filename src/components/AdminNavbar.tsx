@@ -3,11 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { FaMoon, FaSun, FaUserShield, FaUsers, FaShoppingBag, FaHandHoldingHeart, FaCog, FaChartLine } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import GoodbyeModal from './GoodbyeModal';
-
-interface AdminNavbarProps {
-  darkMode: boolean;
-  toggleDarkMode: () => void;
-}
+import { useTheme } from '../context/ThemeContext';
 
 const navLinks = [
   { to: '/admin', label: 'Dashboard', icon: null },
@@ -17,11 +13,12 @@ const navLinks = [
   { to: '/admin/ad-revenue', label: 'AD Revenue', icon: <FaChartLine className="inline mr-1" /> },
 ];
 
-const AdminNavbar: React.FC<AdminNavbarProps> = ({ darkMode, toggleDarkMode }) => {
+const AdminNavbar: React.FC = () => {
   const [showGoodbye, setShowGoodbye] = React.useState(false);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const { darkMode, toggleDarkMode } = useTheme();
 
   const isActive = (path: string) => location.pathname === path;
 

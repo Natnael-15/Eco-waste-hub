@@ -7,7 +7,7 @@ import AdminFooter from '../components/AdminFooter';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { useAuth } from '../context/AuthContext';
 import AdminNavbar from '../components/AdminNavbar';
-import { useAdminTheme } from '../context/AdminThemeContext';
+import { useTheme } from '../context/ThemeContext';
 
 const FAKE_USERS = [
   { id: 'U-001', name: 'Jane Doe', email: 'jane@example.com', role: 'user' },
@@ -113,8 +113,8 @@ function cleanupLegacyLocalStorage() {
   if (localStorage.getItem('donations')) localStorage.removeItem('donations');
 }
 
-const AdminDashboard: React.FC<AdminDashboardProps> = () => {
-  const { darkMode, toggleDarkMode } = useAdminTheme();
+const AdminDashboard: React.FC = () => {
+  const { darkMode } = useTheme();
   const navigate = useNavigate();
   const { logout } = useAuth();
   const [admin, setAdmin] = useState<any>(null);
@@ -270,7 +270,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = () => {
 
   return (
     <>
-      <AdminNavbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+      <AdminNavbar />
       <div className={`min-h-screen bg-gradient-to-br ${darkMode ? 'from-gray-950 via-gray-900 to-gray-950' : 'from-eco-green via-amber-50 to-emerald-100'} py-12 px-4 pb-32 pt-24`}>
         <motion.div initial={{ opacity: 0, y: -30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}
           className="max-w-7xl mx-auto bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border-4 border-eco-green dark:border-eco-yellow p-8">

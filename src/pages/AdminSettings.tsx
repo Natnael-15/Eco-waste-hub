@@ -2,15 +2,15 @@ import React, { useState } from 'react';
 import { FaCog, FaBell, FaMoon, FaSun } from 'react-icons/fa';
 import AdminNavbar from '../components/AdminNavbar';
 import AdminFooter from '../components/AdminFooter';
-import { useAdminTheme } from '../context/AdminThemeContext';
+import { useTheme } from '../context/ThemeContext';
 
 const AdminSettings: React.FC = () => {
-  const { darkMode, toggleDarkMode } = useAdminTheme();
+  const { darkMode, toggleDarkMode } = useTheme();
   const [notifications, setNotifications] = useState(true);
 
   return (
     <>
-      <AdminNavbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+      <AdminNavbar />
       <div className="min-h-screen bg-gradient-to-br from-eco-green via-amber-50 to-emerald-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 py-12 px-4 pb-32 pt-24">
         <div className="max-w-3xl mx-auto bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border-4 border-eco-green dark:border-eco-yellow p-8">
           <h1 className="text-3xl font-bold text-eco-green dark:text-eco-yellow font-playfair flex items-center gap-2 mb-8">
