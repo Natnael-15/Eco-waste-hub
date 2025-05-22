@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { ThemeProvider, useTheme } from './context/ThemeContext';
@@ -36,13 +36,28 @@ import AdminAdRevenue from './pages/AdminAdRevenue';
 import './App.css';
 import { supabase } from './lib/supabase';
 
+const BackButton: React.FC = () => {
+  const navigate = useNavigate();
+  return (
+    <button
+      onClick={() => navigate(-1)}
+      className="fixed top-4 left-4 z-50 bg-eco-green text-white dark:bg-eco-yellow dark:text-gray-900 rounded-full shadow-lg px-4 py-2 text-lg font-bold hover:bg-eco-yellow hover:text-eco-green dark:hover:bg-eco-green dark:hover:text-white transition border-2 border-white dark:border-gray-900"
+      aria-label="Go back"
+    >
+      ← Back
+    </button>
+  );
+};
+
 const AppRoutes: React.FC<{ darkMode: boolean, toggleDarkMode: () => void }> = ({ darkMode, toggleDarkMode }) => {
   const location = useLocation();
   const hideNavAndFooter = location.pathname === '/login' || location.pathname === '/signup';
   const isAdminRoute = location.pathname.startsWith('/admin');
+  const isGameArcade = location.pathname === '/game-arcade';
   return (
     <div className="flex flex-col min-h-screen">
-      {!hideNavAndFooter && <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />}
+      {!hideNavAndFooter && !isGameArcade && <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />}
+      {isGameArcade && <BackButton />}
       <main className="flex-grow">
         {isAdminRoute ? (
           <Routes>
@@ -91,7 +106,7 @@ const AppRoutes: React.FC<{ darkMode: boolean, toggleDarkMode: () => void }> = (
           </Routes>
         )}
       </main>
-      {!(location.pathname.startsWith('/admin')) && !hideNavAndFooter && <Footer darkMode={darkMode} />}
+      {!(location.pathname.startsWith('/admin')) && !hideNavAndFooter && !isGameArcade && <Footer darkMode={darkMode} />}
     </div>
   );
 };
