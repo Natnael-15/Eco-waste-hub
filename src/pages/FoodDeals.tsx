@@ -53,11 +53,10 @@ const FoodDeals: React.FC<FoodDealsProps> = ({ darkMode, toggleDarkMode }) => {
         // Normalize data types
         const normalized = (data || []).map(product => ({
           ...product,
-          price: product.price ? Number(product.price) : 0,
-          rating: product.rating ? Number(product.rating) : 0,
-          discountPercent: 30,
           originalPrice: product.price ? Number(product.price) : 0,
           price: product.price ? Number(product.price) * 0.7 : 0,
+          rating: product.rating ? Number(product.rating) : 0,
+          discountPercent: 30,
           tags: Array.isArray(product.tags) ? product.tags : [],
         }));
         setDeals(normalized);
