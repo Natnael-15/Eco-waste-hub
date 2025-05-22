@@ -51,14 +51,22 @@ const FoodDeals: React.FC<FoodDealsProps> = ({ darkMode, toggleDarkMode }) => {
       .then(res => res.json())
       .then(data => {
         // Normalize data types
-        const normalized = (data || []).map(product => ({
-          ...product,
-          originalPrice: product.price ? Number(product.price) : 0,
-          price: product.price ? Number(product.price) * 0.7 : 0,
-          rating: product.rating ? Number(product.rating) : 0,
-          discountPercent: 30,
-          tags: Array.isArray(product.tags) ? product.tags : [],
-        }));
+        const normalized = (data || []).map(product => {
+          const originalPrice = product.price ? Number(product.price) : 0;
+          return {
+            id: product.id,
+            name: product.name,
+            description: product.description,
+            image: product.image,
+            category: product.category,
+            originalPrice,
+            price: originalPrice * 0.7,
+            rating: product.rating ? Number(product.rating) : 0,
+            discountPercent: 30,
+            tags: Array.isArray(product.tags) ? product.tags : [],
+            featured: product.featured || false
+          };
+        });
         setDeals(normalized);
         setLoadingDeals(false);
       })
