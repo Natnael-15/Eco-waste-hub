@@ -1,10 +1,15 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { FaInstagram, FaTwitter, FaFacebook, FaLeaf } from 'react-icons/fa';
 import { useTheme } from '../context/ThemeContext';
 
 const Footer: React.FC = () => {
   const { darkMode } = useTheme();
+  const location = useLocation();
+  // Hide Footer on replica social media pages
+  if (["/instagram", "/facebook", "/twitter"].includes(location.pathname)) {
+    return null;
+  }
 
   return (
     <footer className="bg-eco-green dark:bg-gray-950 text-white dark:text-eco-yellow py-12 mt-16 border-t border-eco-green/40 dark:border-gray-800 transition-colors duration-300">
