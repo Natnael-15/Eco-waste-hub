@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import Navbar from '../components/Navbar';
+import { useNavigate } from 'react-router-dom';
 
 const LONDON_COORDS = [51.5074, -0.1278];
 
 const socialLinks = [
-  { icon: '/assets/instagram-icon.png', alt: 'Instagram', href: 'https://instagram.com/' },
-  { icon: '/assets/twitter-icon.png', alt: 'Twitter', href: 'https://twitter.com/' },
-  { icon: '/assets/facebook-icon.png', alt: 'Facebook', href: 'https://facebook.com/' },
+  { icon: '/assets/instagram-icon.png', alt: 'Instagram', to: '/instagram' },
+  { icon: '/assets/twitter-icon.png', alt: 'Twitter', to: '/twitter' },
+  { icon: '/assets/facebook-icon.png', alt: 'Facebook', to: '/facebook' },
 ];
 
 interface ContactProps {
@@ -26,6 +27,7 @@ const Contact: React.FC<ContactProps> = ({ darkMode, toggleDarkMode }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -154,9 +156,14 @@ const Contact: React.FC<ContactProps> = ({ darkMode, toggleDarkMode }) => {
               <div className="flex items-center gap-2"><span className="inline-block w-6 text-center">📍</span><span className="font-bold">Address:</span> 123 Green Lane, London, UK</div>
               <div className="flex gap-4 mt-4">
                 {socialLinks.map(link => (
-                  <a key={link.alt} href={link.href} target="_blank" rel="noopener noreferrer" className="inline-block">
+                  <button
+                    key={link.alt}
+                    onClick={() => navigate(link.to)}
+                    className="inline-block"
+                    aria-label={link.alt}
+                  >
                     <img src={link.icon} alt={link.alt} className="w-7 h-7 rounded-full bg-white dark:bg-gray-900 p-1 shadow hover:scale-110 transition" />
-                  </a>
+                  </button>
                 ))}
               </div>
             </div>
