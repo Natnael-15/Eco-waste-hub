@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { FaMoon, FaSun, FaRecycle, FaLeaf, FaChartLine, FaTrophy, FaUserCircle } from 'react-icons/fa';
+import { FaMoon, FaSun, FaRecycle, FaLeaf, FaChartLine, FaTrophy, FaUserCircle, FaShoppingBasket } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import GoodbyeModal from './GoodbyeModal';
 import { ShoppingCart, User, Menu, X } from 'lucide-react';
@@ -14,8 +14,8 @@ const Navbar: React.FC = () => {
   const isLoggedIn = !!user;
   const { darkMode, toggleDarkMode } = useTheme();
 
-  // Hide Navbar on admin and admin-login routes
-  if (location.pathname.startsWith('/admin')) {
+  // Hide Navbar on admin routes, but NOT on /admin-login
+  if (location.pathname.startsWith('/admin') && location.pathname !== '/admin-login') {
     return null;
   }
 
@@ -24,10 +24,15 @@ const Navbar: React.FC = () => {
       setShowGoodbye(true);
       await new Promise(resolve => setTimeout(resolve, 2000));
       await logout();
-      navigate('/login', { replace: true });
+      // Clear any remaining state
+      localStorage.removeItem('cart');
+      sessionStorage.clear();
+      // Force a hard reload to clear any remaining state
+      window.location.href = '/login';
     } catch (error) {
       console.error('Error signing out:', error);
       setShowGoodbye(false);
+      alert('Failed to log out. Please try again.');
     }
   };
 
@@ -84,6 +89,14 @@ const Navbar: React.FC = () => {
                 </Link>
               </span>
             )}
+            {/* Wishlist Icon */}
+            {isLoggedIn && (
+              <span className="inline-flex items-center ml-2">
+                <Link to="/wishlist" aria-label="Wishlist" className="text-white dark:text-eco-yellow text-2xl hover:text-eco-yellow dark:hover:text-white transition p-1 rounded-full">
+                  <FaShoppingBasket />
+                </Link>
+              </span>
+            )}
             {!isLoggedIn ? (
               <>
                 <Link
@@ -93,7 +106,7 @@ const Navbar: React.FC = () => {
                   Login
                 </Link>
                 <Link
-                  to="/join-us"
+                  to="/signup"
                   className="px-4 py-2 rounded-full bg-eco-yellow text-eco-green font-bold shadow hover:bg-yellow-300 transition"
                 >
                   Sign Up

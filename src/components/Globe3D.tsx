@@ -3,6 +3,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Sphere, PerspectiveCamera, useTexture } from '@react-three/drei';
 import { useNavigate, useLocation } from 'react-router-dom';
 import * as THREE from 'three';
+import { ASSETS } from '../constants/images';
 
 const GlobeMesh: React.FC = () => {
   const meshRef = useRef<THREE.Mesh>(null);
@@ -10,21 +11,39 @@ const GlobeMesh: React.FC = () => {
 
   useEffect(() => {
     const loader = new THREE.TextureLoader();
+    console.log('Attempting to load earth texture from:', ASSETS.EARTH_TEXTURE);
     loader.load(
-      '/assets/earth-blue-marble.jpg',
+      ASSETS.EARTH_TEXTURE,
       (loadedTexture) => {
-        loadedTexture.wrapS = loadedTexture.wrapT = THREE.RepeatWrapping;
+        console.log('Earth texture loaded successfully:', loadedTexture);
+        loadedTexture.wrapS = loadedTexture.wrapT = THREE.ClampToEdgeWrapping;
+        loadedTexture.repeat.set(1, 1);
+        loadedTexture.offset.set(0, 0);
+        if (loadedTexture.colorSpace !== undefined) {
+          loadedTexture.colorSpace = THREE.SRGBColorSpace;
+        } else if (loadedTexture.encoding !== undefined) {
+          loadedTexture.encoding = THREE.sRGBEncoding;
+        }
         setTexture(loadedTexture);
+        // Log texture image property
+        console.log('Loaded texture image property:', loadedTexture.image);
       },
       undefined,
       (error) => {
-        console.warn('Error loading earth texture:', error);
-        // Create a fallback texture
+        console.error('Error loading earth texture:', error);
         const fallbackTexture = new THREE.TextureLoader().load('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==');
         setTexture(fallbackTexture);
       }
     );
   }, []);
+
+  // Force material update when texture changes
+  useEffect(() => {
+    if (meshRef.current && texture) {
+      meshRef.current.material.needsUpdate = true;
+      console.log('Forced material update with texture:', texture);
+    }
+  }, [texture]);
 
   const { gl } = useThree();
 
@@ -53,17 +72,23 @@ const GlobeMesh: React.FC = () => {
   useFrame(() => {
     if (meshRef.current) {
       meshRef.current.rotation.y += 0.0015;
+      // Start with a rotation so land is visible
+      if (meshRef.current.rotation.y < 0.5) {
+        meshRef.current.rotation.y = 0.5;
+      }
     }
   });
 
   return (
-    <Sphere ref={meshRef} args={[1, 64, 64]} castShadow receiveShadow>
-      <meshStandardMaterial map={texture} />
+    <Sphere ref={meshRef} args={[4, 64, 64]} castShadow receiveShadow>
+      <meshBasicMaterial 
+        map={texture}
+      />
     </Sphere>
   );
 };
 
-const Globe3D: React.FC<{ className?: string }> = ({ className = '' }) => {
+const Globe3D: React.FC<{ className?: string; width?: number; height?: number }> = ({ className = '', width = 900, height = 900 }) => {
   const [isVisible, setIsVisible] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
@@ -90,11 +115,11 @@ const Globe3D: React.FC<{ className?: string }> = ({ className = '' }) => {
   return (
     <div
       className={`flex flex-col items-center justify-center w-full py-6 md:py-10 ${className}`}
-      style={{ minHeight: 340 }}
+      style={{ minHeight: height + 40 }}
     >
       <div
         className="relative rounded-full overflow-hidden aspect-square"
-        style={{ width: 300, height: 300, cursor: 'pointer', boxShadow: '0 0 32px #0004' }}
+        style={{ width, height, maxWidth: '100%', maxHeight: '100%', cursor: 'pointer', boxShadow: '0 0 32px #0004' }}
         onClick={handleClick}
         tabIndex={0}
         role="button"
@@ -105,7 +130,7 @@ const Globe3D: React.FC<{ className?: string }> = ({ className = '' }) => {
           <Canvas
             shadows
             dpr={[1, 1.5]}
-            style={{ width: '100%', height: '100%' }}
+            style={{ width: '100%', height: '100%', display: 'block' }}
             gl={{
               powerPreference: 'high-performance',
               antialias: true,
@@ -116,7 +141,7 @@ const Globe3D: React.FC<{ className?: string }> = ({ className = '' }) => {
               failIfMajorPerformanceCaveat: true,
             }}
           >
-            <PerspectiveCamera makeDefault position={[0, 0, 3]} />
+            <PerspectiveCamera makeDefault position={[0, 0, 13]} />
             <ambientLight intensity={0.6} />
             <directionalLight position={[5, 5, 5]} intensity={1.1} castShadow />
             <GlobeMesh />

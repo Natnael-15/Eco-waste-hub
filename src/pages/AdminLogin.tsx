@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaUserShield, FaEnvelope, FaLock, FaSpinner, FaLeaf } from 'react-icons/fa';
-import { supabase } from '../lib/supabase';
-import Navbar from '../components/Navbar';
 
 const AdminLogin: React.FC = () => {
   const navigate = useNavigate();
@@ -15,37 +13,21 @@ const AdminLogin: React.FC = () => {
     e.preventDefault();
     setError('');
     setLoading(true);
-    try {
-      // Sign in with Supabase
-      const { data, error: loginError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      if (loginError) throw loginError;
-      // Check role in profiles table
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', data.user.id)
-        .single();
-      if (profileError) throw profileError;
-      if (!profile || profile.role !== 'admin') {
-        setError('You are not authorized to access the admin dashboard.');
-        setLoading(false);
-        await supabase.auth.signOut();
-        return;
-      }
-      // Success: redirect to admin dashboard
-      navigate('/admin');
-    } catch (err: any) {
-      setError(err.message || 'Login failed.');
+    // Hardcoded admin credentials
+    if (email === 'ecohub@gmail.com' && password === 'pass123') {
+      sessionStorage.setItem('isHardcodedAdmin', 'true');
+      navigate('/admin', { replace: true });
+      return;
+    } else {
+      sessionStorage.removeItem('isHardcodedAdmin');
+      setError('Invalid admin credentials.');
       setLoading(false);
+      return;
     }
   };
 
   return (
     <>
-      <Navbar />
       <div className="min-h-screen bg-gradient-to-br from-eco-green via-amber-50 to-emerald-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 flex items-center justify-center py-12 px-4">
         <div className="max-w-md w-full bg-white dark:bg-gray-900 p-10 rounded-2xl shadow-2xl border-4 border-eco-green dark:border-eco-yellow animate-fade-in">
           <div className="flex flex-col items-center mb-6">
@@ -55,7 +37,8 @@ const AdminLogin: React.FC = () => {
             <h2 className="text-3xl font-extrabold text-eco-green dark:text-eco-yellow font-playfair">Admin Login</h2>
             <p className="text-gray-500 dark:text-gray-300 mt-2 text-center">Sign in to access the admin dashboard</p>
           </div>
-          <form className="space-y-6" onSubmit={handleSubmit}>
+          
+          <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
               <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-3 rounded-lg text-sm animate-shake">
                 {error}
@@ -107,7 +90,8 @@ const AdminLogin: React.FC = () => {
               {loading ? <FaSpinner className="animate-spin h-5 w-5" /> : 'Sign in as Admin'}
             </button>
           </form>
-          <div className="mt-8 text-center">
+          
+          <div className="mt-6 text-center">
             <button
               onClick={() => navigate('/login')}
               className="text-eco-green dark:text-eco-yellow hover:underline hover:text-eco-yellow dark:hover:text-eco-green text-sm font-semibold transition-colors duration-200"

@@ -142,28 +142,31 @@ const Donate: React.FC<DonateProps> = ({ darkMode, toggleDarkMode }) => {
       </section>
 
       {/* Impact Highlights */}
-        <section className="max-w-4xl mx-auto grid md:grid-cols-3 gap-8 py-10 px-4">
+      <section className="max-w-5xl mx-auto grid md:grid-cols-3 gap-8 py-10 px-4">
         {impactStats.map(stat => (
-            <motion.div
-              key={stat.label}
-              className="bg-white/60 dark:bg-gray-900/70 backdrop-blur-lg rounded-2xl shadow-xl p-8 flex flex-col items-center gap-3 border border-eco-green/10 dark:border-eco-yellow/10"
-              whileHover={{ scale: 1.04 }}
-            >
-              <div className="text-4xl mb-2">{stat.icon}</div>
-              <AnimatedNumber value={stat.value} suffix="+" className="text-3xl font-extrabold text-eco-green dark:text-eco-yellow" />
-              <div className="text-gray-600 dark:text-gray-300 text-lg">{stat.label}</div>
-            </motion.div>
+          <motion.div
+            key={stat.label}
+            className="bg-white/70 dark:bg-gray-900/80 backdrop-blur-xl rounded-3xl shadow-2xl p-10 flex flex-col items-center gap-4 border border-eco-green/10 dark:border-eco-yellow/10 hover:shadow-eco-green/20 dark:hover:shadow-eco-yellow/20 transition-all duration-300 group"
+            whileHover={{ scale: 1.06, rotate: 1 }}
+          >
+            <div className="text-5xl mb-2 group-hover:scale-110 transition-transform duration-300">{stat.icon}</div>
+            <AnimatedNumber value={stat.value} suffix="+" className="text-4xl font-extrabold text-eco-green dark:text-eco-yellow" />
+            <div className="text-gray-700 dark:text-gray-200 text-lg font-semibold">{stat.label}</div>
+          </motion.div>
         ))}
       </section>
 
-      {/* Donation Form */}
-      <section id="donate-form" className="max-w-2xl mx-auto px-4 py-10">
-          <motion.div
-            className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg rounded-3xl shadow-2xl p-10 border border-eco-green/20 dark:border-eco-yellow/20"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
-            <h2 className="text-3xl font-bold text-eco-green dark:text-eco-yellow mb-6 font-playfair">Donate</h2>
+      {/* Donation Form Modern Redesign */}
+      <section id="donate-form" className="max-w-5xl mx-auto px-4 py-10 flex flex-col md:flex-row gap-10 items-start">
+        <motion.div
+          className="flex-1 bg-white/80 dark:bg-gray-900/80 backdrop-blur-2xl rounded-3xl shadow-2xl p-10 border border-eco-green/20 dark:border-eco-yellow/20 relative overflow-hidden"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          {/* Animated floating icons */}
+          <FaHandHoldingHeart className="absolute -top-8 -left-8 text-eco-yellow/30 text-7xl animate-float-slow" />
+          <FaLeaf className="absolute -bottom-8 -right-8 text-eco-green/20 text-7xl animate-float-slower" />
+          <h2 className="text-3xl font-bold text-eco-green dark:text-eco-yellow mb-6 font-playfair">Donate</h2>
           {submitted ? (
             <div className="text-green-700 dark:text-green-400 text-center py-8">
               <div className="text-4xl mb-2">🎉</div>
@@ -174,100 +177,117 @@ const Donate: React.FC<DonateProps> = ({ darkMode, toggleDarkMode }) => {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label className="block text-gray-700 dark:text-eco-yellow font-semibold mb-2">Donation Amount</label>
-                  <div className="flex gap-3 mb-3 flex-wrap">
+                <div className="flex gap-3 mb-3 flex-wrap">
                   {presetAmounts.map(amt => (
                     <button
                       type="button"
                       key={amt}
                       onClick={() => handleAmountClick(amt)}
-                        className={`px-5 py-2 rounded-full font-bold border transition ${amount === amt ? 'bg-eco-green text-white border-eco-green shadow-lg scale-105' : 'bg-gray-100 dark:bg-gray-800 text-eco-green border-eco-green/30 hover:bg-eco-yellow/30'}`}
+                      className={`px-5 py-2 rounded-full font-bold border transition ${amount === amt ? 'bg-eco-green text-white border-eco-green shadow-lg scale-105' : 'bg-gray-100 dark:bg-gray-800 text-eco-green border-eco-green/30 hover:bg-eco-yellow/30'}`}
                     >
                       £{amt}
                     </button>
                   ))}
-                  <input
-                    type="number"
-                    min={1}
-                    placeholder="Custom"
-                    value={customAmount}
-                    onChange={handleCustomAmount}
-                    className="w-24 px-3 py-2 rounded-full border border-eco-green/30 focus:border-eco-green focus:ring-2 focus:ring-eco-green/20 transition text-eco-green font-bold bg-gray-100 dark:bg-gray-800 outline-none"
-                  />
+                  <div className="relative">
+                    <input
+                      type="number"
+                      min={1}
+                      placeholder="Custom"
+                      value={customAmount}
+                      onChange={handleCustomAmount}
+                      className="w-24 px-3 py-2 rounded-full border border-eco-green/30 focus:border-eco-green focus:ring-2 focus:ring-eco-green/20 transition text-eco-green font-bold bg-gray-100 dark:bg-gray-800 outline-none pl-8"
+                    />
+                    <FaLeaf className="absolute left-2 top-1/2 -translate-y-1/2 text-eco-green/40 text-lg pointer-events-none" />
+                  </div>
                 </div>
                 <div className="flex items-center gap-2 mb-3">
-                    {/* Toggle switch for recurring donation */}
-                    <button
-                      type="button"
-                      aria-pressed={recurring}
-                      onClick={() => setRecurring(r => !r)}
-                      className={`w-12 h-7 flex items-center rounded-full p-1 transition-colors duration-300 ${recurring ? 'bg-eco-green' : 'bg-gray-300 dark:bg-gray-700'}`}
-                    >
-                      <span className={`w-5 h-5 bg-white rounded-full shadow transform transition-transform duration-300 ${recurring ? 'translate-x-5' : ''}`}></span>
-                    </button>
-                    <span className="text-eco-green dark:text-eco-yellow font-semibold flex items-center gap-1 cursor-pointer select-none">
-                      <FaRedo className="inline-block text-eco-green dark:text-eco-yellow" /> Monthly donation
-                    </span>
+                  {/* Toggle switch for recurring donation */}
+                  <button
+                    type="button"
+                    aria-pressed={recurring}
+                    onClick={() => setRecurring(r => !r)}
+                    className={`w-12 h-7 flex items-center rounded-full p-1 transition-colors duration-300 ${recurring ? 'bg-eco-green' : 'bg-gray-300 dark:bg-gray-700'}`}
+                  >
+                    <span className={`w-5 h-5 bg-white rounded-full shadow transform transition-transform duration-300 ${recurring ? 'translate-x-5' : ''}`}></span>
+                  </button>
+                  <span className="text-eco-green dark:text-eco-yellow font-semibold flex items-center gap-1 cursor-pointer select-none">
+                    <FaRedo className="inline-block text-eco-green dark:text-eco-yellow" /> Monthly donation
+                  </span>
                 </div>
               </div>
               <div className="relative">
+                <FaRegSmile className="absolute left-3 top-1/2 -translate-y-1/2 text-eco-green/40 text-lg pointer-events-none" />
                 <input
                   type="text"
                   name="name"
                   value={name}
                   onChange={e => setName(e.target.value)}
-                  className="peer w-full p-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:border-eco-green focus:ring-2 focus:ring-eco-green/20 transition placeholder-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-eco-yellow"
+                  className="peer w-full p-3 pl-10 border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:border-eco-green focus:ring-2 focus:ring-eco-green/20 transition placeholder-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-eco-yellow"
                   placeholder="Your Name (optional)"
                 />
-                <label className="absolute left-3 top-3 text-gray-500 dark:text-eco-yellow pointer-events-none transition-all duration-200 peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-focus:-top-4 peer-focus:text-xs peer-focus:text-eco-green bg-white dark:bg-gray-800 px-1">Your Name (optional)</label>
+                <label className="absolute left-10 top-3 text-gray-500 dark:text-eco-yellow pointer-events-none transition-all duration-200 peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-focus:-top-4 peer-focus:text-xs peer-focus:text-eco-green bg-white dark:bg-gray-800 px-1">Your Name (optional)</label>
               </div>
               <div className="relative">
+                <FaHandHoldingHeart className="absolute left-3 top-1/2 -translate-y-1/2 text-eco-yellow/40 text-lg pointer-events-none" />
                 <input
                   type="text"
                   name="message"
                   value={message}
                   onChange={e => setMessage(e.target.value)}
-                  className="peer w-full p-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:border-eco-green focus:ring-2 focus:ring-eco-green/20 transition placeholder-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-eco-yellow"
+                  className="peer w-full p-3 pl-10 border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:border-eco-green focus:ring-2 focus:ring-eco-green/20 transition placeholder-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-eco-yellow"
                   placeholder="Message (optional)"
                 />
-                <label className="absolute left-3 top-3 text-gray-500 dark:text-eco-yellow pointer-events-none transition-all duration-200 peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-focus:-top-4 peer-focus:text-xs peer-focus:text-eco-green bg-white dark:bg-gray-800 px-1">Message (optional)</label>
+                <label className="absolute left-10 top-3 text-gray-500 dark:text-eco-yellow pointer-events-none transition-all duration-200 peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-focus:-top-4 peer-focus:text-xs peer-focus:text-eco-green bg-white dark:bg-gray-800 px-1">Message (optional)</label>
               </div>
               {error && <div className="text-red-600 dark:text-red-400 text-sm mb-2">{error}</div>}
-                <button type="submit" className="w-full bg-eco-yellow text-eco-green font-bold py-3 rounded-lg hover:bg-yellow-300 transition text-lg flex items-center justify-center gap-2 shadow-lg">
+              <button type="submit" className="w-full bg-eco-yellow text-eco-green font-bold py-3 rounded-lg hover:bg-yellow-300 transition text-lg flex items-center justify-center gap-2 shadow-lg">
                 <FaHandHoldingHeart className="text-eco-green dark:text-eco-yellow" /> Donate
               </button>
             </form>
           )}
-          </motion.div>
+        </motion.div>
+        {/* Why Donate Sidebar */}
+        <aside className="hidden md:block w-full max-w-xs">
+          <div className="sticky top-32 bg-white/90 dark:bg-gray-900/90 rounded-3xl shadow-xl p-8 border border-eco-green/10 dark:border-eco-yellow/10 flex flex-col gap-6 animate-fade-in">
+            <h3 className="text-xl font-bold text-eco-green dark:text-eco-yellow mb-2 flex items-center gap-2"><FaLeaf className="text-eco-green dark:text-eco-yellow" /> Why Donate?</h3>
+            <ul className="space-y-3 text-gray-700 dark:text-gray-200 text-base">
+              <li className="flex items-center gap-2"><FaHandHoldingHeart className="text-eco-yellow" /> Rescue surplus food from going to waste</li>
+              <li className="flex items-center gap-2"><FaRegSmile className="text-eco-green" /> Support families in need in your community</li>
+              <li className="flex items-center gap-2"><FaLeaf className="text-eco-green" /> Help build a greener, more sustainable future</li>
+              <li className="flex items-center gap-2"><FaLock className="text-eco-green" /> 100% secure and transparent donations</li>
+            </ul>
+          </div>
+        </aside>
       </section>
 
-        {/* Trust & Partners Section */}
-      <section className="max-w-4xl mx-auto px-4 pb-12">
-          <div className="bg-white/80 dark:bg-gray-900/80 rounded-xl shadow-lg p-8 flex flex-col md:flex-row items-center gap-8 justify-between border border-eco-green/10 dark:border-eco-yellow/10">
+      {/* Trust & Partners Section Modernized */}
+      <section className="max-w-5xl mx-auto px-4 pb-12">
+        <div className="flex flex-col items-center mb-6">
+          <span className="inline-block px-4 py-1 bg-eco-green/20 dark:bg-eco-yellow/20 rounded-full text-eco-green dark:text-eco-yellow font-semibold tracking-wide text-sm uppercase shadow-sm border border-eco-green/30 dark:border-eco-yellow/30 mb-2">Trusted by</span>
+        </div>
+        <div className="bg-white/90 dark:bg-gray-900/90 rounded-xl shadow-lg p-8 flex flex-col md:flex-row items-center gap-8 justify-between border border-eco-green/10 dark:border-eco-yellow/10">
           <div className="flex-1 flex flex-col gap-3 mb-6 md:mb-0">
-              <span className="inline-flex items-center gap-2 px-3 py-1 bg-eco-green/10 dark:bg-eco-yellow/10 rounded-full font-bold text-eco-green dark:text-eco-yellow">
-                <FaLock className="text-eco-green dark:text-eco-yellow" /> 100% Secure Payment
-              </span>
+            <span className="inline-flex items-center gap-2 px-3 py-1 bg-eco-green/10 dark:bg-eco-yellow/10 rounded-full font-bold text-eco-green dark:text-eco-yellow">
+              <FaLock className="text-eco-green dark:text-eco-yellow" /> 100% Secure Payment
+            </span>
             <div className="text-gray-500 dark:text-gray-300 text-sm">Your donation is protected and encrypted.</div>
           </div>
-            <div className="flex-1 flex flex-col items-center justify-center">
-              <div className="mb-2 text-center">
-                <span className="inline-block px-4 py-1 bg-eco-green/20 dark:bg-eco-yellow/20 rounded-full text-eco-green dark:text-eco-yellow font-semibold tracking-wide text-sm uppercase shadow-sm border border-eco-green/30 dark:border-eco-yellow/30">Trusted Partners</span>
-              </div>
-              <div className="flex gap-8 items-end justify-center">
-            {partners.map(partner => (
-                  <button key={partner.name} type="button" onClick={() => setOpenPartner(partner)} className="focus:outline-none">
-                    <div className="flex flex-col items-center group">
-                      <div className="bg-white dark:bg-gray-800 rounded-full p-3 shadow-md border-2 border-eco-green/20 dark:border-eco-yellow/20 mb-2 transition-transform group-hover:scale-105">
-                        <img src={partner.logo} alt={partner.name} className="h-12 w-12 object-contain grayscale hover:grayscale-0 transition" />
-                      </div>
-                      <span className="text-xs font-bold text-eco-green dark:text-eco-yellow mt-1 tracking-wide uppercase opacity-80">{partner.name}</span>
+          <div className="flex-1 flex flex-col items-center justify-center">
+            <div className="flex gap-8 items-end justify-center">
+              {partners.map(partner => (
+                <button key={partner.name} type="button" onClick={() => setOpenPartner(partner)} className="focus:outline-none">
+                  <div className="flex flex-col items-center group">
+                    <div className="bg-white dark:bg-gray-800 rounded-full p-3 shadow-md border-2 border-eco-green/20 dark:border-eco-yellow/20 mb-2 transition-transform group-hover:scale-105">
+                      <img src={partner.logo} alt={partner.name} className="h-12 w-12 object-contain grayscale hover:grayscale-0 transition" />
                     </div>
-                  </button>
-            ))}
+                    <span className="text-xs font-bold text-eco-green dark:text-eco-yellow mt-1 tracking-wide uppercase opacity-80">{partner.name}</span>
+                  </div>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
-          </div>
-          <PartnerModal open={!!openPartner} onClose={() => setOpenPartner(null)} partner={openPartner} />
+        <PartnerModal open={!!openPartner} onClose={() => setOpenPartner(null)} partner={openPartner} />
       </section>
     </div>
     </>

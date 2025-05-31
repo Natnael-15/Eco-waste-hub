@@ -113,6 +113,45 @@ function cleanupLegacyLocalStorage() {
   if (localStorage.getItem('donations')) localStorage.removeItem('donations');
 }
 
+// Helper to generate fake users with realistic names and emails, all with role 'user'
+function generateFakeUsers(count: number, existingIds: Set<string>) {
+  const firstNames = [
+    'James', 'Mary', 'John', 'Patricia', 'Robert', 'Jennifer', 'Michael', 'Linda', 'William', 'Elizabeth',
+    'David', 'Barbara', 'Richard', 'Susan', 'Joseph', 'Jessica', 'Thomas', 'Sarah', 'Charles', 'Karen',
+    'Christopher', 'Nancy', 'Daniel', 'Lisa', 'Matthew', 'Betty', 'Anthony', 'Margaret', 'Mark', 'Sandra',
+    'Donald', 'Ashley', 'Steven', 'Kimberly', 'Paul', 'Emily', 'Andrew', 'Donna', 'Joshua', 'Michelle',
+    'Kenneth', 'Dorothy', 'Kevin', 'Carol', 'Brian', 'Amanda', 'George', 'Melissa', 'Edward', 'Deborah'
+  ];
+  const lastNames = [
+    'Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez',
+    'Hernandez', 'Lopez', 'Gonzalez', 'Wilson', 'Anderson', 'Thomas', 'Taylor', 'Moore', 'Jackson', 'Martin',
+    'Lee', 'Perez', 'Thompson', 'White', 'Harris', 'Sanchez', 'Clark', 'Ramirez', 'Lewis', 'Robinson',
+    'Walker', 'Young', 'Allen', 'King', 'Wright', 'Scott', 'Torres', 'Nguyen', 'Hill', 'Flores',
+    'Green', 'Adams', 'Nelson', 'Baker', 'Hall', 'Rivera', 'Campbell', 'Mitchell', 'Carter', 'Roberts'
+  ];
+  const fakeUsers = [];
+  for (let i = 0; i < count; i++) {
+    let id;
+    do {
+      id = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
+    } while (existingIds.has(id));
+    const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+    const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+    const name = `${firstName} ${lastName}`;
+    // Generate a realistic email
+    const email = `${firstName.toLowerCase()}.${lastName.toLowerCase()}${Math.floor(Math.random() * 1000)}@example.com`;
+    fakeUsers.push({
+      id,
+      name,
+      email,
+      role: 'user',
+      created_at: new Date(Date.now() - Math.floor(Math.random() * 10000000000)).toISOString(),
+    });
+    existingIds.add(id);
+  }
+  return fakeUsers;
+}
+
 const AdminDashboard: React.FC = () => {
   const { darkMode } = useTheme();
   const navigate = useNavigate();
@@ -146,15 +185,37 @@ const AdminDashboard: React.FC = () => {
     cleanupLegacyLocalStorage();
   }, []);
 
+  // Load and merge real users with fake users (like AdminUsers)
+  useEffect(() => {
+    const loadAndMergeUsers = async () => {
+      // Fetch real users from Supabase
+      let realUsers: any[] = [];
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('id, name, email, role, created_at');
+        if (error) {
+          console.error('Error fetching users:', error);
+        } else {
+          realUsers = data || [];
+        }
+      } catch (err) {
+        console.error('Error fetching users:', err);
+      }
+      // Generate fake users, ensuring no ID collision with real users
+      const existingIds = new Set(realUsers.map(u => u.id));
+      const fakeUsers = generateFakeUsers(200, existingIds);
+      // Merge: real users + fake users
+      const merged = [...realUsers, ...fakeUsers];
+      setUsers(merged);
+    };
+    loadAndMergeUsers();
+  }, []);
+
   // Inject fake data if empty
   useEffect(() => {
-    let storedUsers = JSON.parse(localStorage.getItem('users') || '[]');
     let storedOrders = JSON.parse(localStorage.getItem('orders') || '[]');
     let storedDonations = JSON.parse(localStorage.getItem('donations') || '[]');
-    if (!storedUsers.length) {
-      localStorage.setItem('users', JSON.stringify(FAKE_USERS));
-      storedUsers = FAKE_USERS;
-    }
     if (!storedOrders.length) {
       localStorage.setItem('orders', JSON.stringify(FAKE_ORDERS));
       storedOrders = FAKE_ORDERS;
@@ -163,7 +224,6 @@ const AdminDashboard: React.FC = () => {
       localStorage.setItem('donations', JSON.stringify(FAKE_DONATIONS));
       storedDonations = FAKE_DONATIONS;
     }
-    setUsers(storedUsers);
     setOrders(storedOrders);
     setDonations(storedDonations);
   }, []);

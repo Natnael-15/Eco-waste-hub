@@ -5,7 +5,8 @@ import { FaEnvelope, FaLock, FaSpinner } from 'react-icons/fa';
 
 const Login = () => {
   const navigate = useNavigate();
-  const { user, login, loading } = useAuth();
+  const { user, signIn } = useAuth();
+  const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -30,8 +31,9 @@ const Login = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
     try {
-      await login(email, password);
+      await signIn(email, password);
       if (rememberMe) {
         localStorage.setItem('rememberedEmail', email);
       } else {
@@ -40,6 +42,8 @@ const Login = () => {
       // Redirect handled by AuthContext/user effect
     } catch (err: any) {
       setError(err.message || 'An error occurred during login');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -158,7 +162,7 @@ const Login = () => {
 
           <div className="mt-6">
             <button
-              onClick={() => navigate('/sign-up')}
+              onClick={() => navigate('/signup')}
               className="w-full flex justify-center py-2 px-4 border border-eco-green dark:border-eco-yellow rounded-md shadow-sm text-sm font-medium text-eco-green dark:text-eco-yellow bg-white dark:bg-gray-900 hover:bg-eco-green hover:text-white dark:hover:bg-eco-yellow dark:hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-eco-green dark:focus:ring-eco-yellow transition-colors duration-200"
             >
               Create an account

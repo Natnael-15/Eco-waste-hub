@@ -66,7 +66,7 @@ const BecomePartner: React.FC = () => {
     setError(null);
     if (!user) {
       setRedirecting(true);
-      setTimeout(() => navigate('/sign-up'), 1200);
+      setTimeout(() => navigate('/signup'), 1200);
       setLoading(false);
       return;
     }
@@ -180,7 +180,7 @@ const BecomePartner: React.FC = () => {
                 <p className="text-gray-700 dark:text-gray-200 text-center mb-4">You need an account to become a partner and access this form.</p>
                 <div className="flex gap-4">
                   <button
-                    onClick={() => navigate('/sign-up')}
+                    onClick={() => navigate('/signup')}
                     className="px-5 py-2 rounded-full bg-eco-green text-white font-bold shadow hover:bg-eco-yellow hover:text-eco-green dark:bg-eco-yellow dark:text-eco-green dark:hover:bg-eco-green dark:hover:text-eco-yellow transition"
                   >
                     Sign Up

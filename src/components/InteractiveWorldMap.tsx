@@ -2,6 +2,7 @@ import React, { useRef, useState, Suspense, useEffect } from 'react';
 import { Canvas, useLoader } from '@react-three/fiber';
 import { OrbitControls, Stars, Html } from '@react-three/drei';
 import * as THREE from 'three';
+import { ASSETS } from '../constants/images';
 
 // Country data with fun facts
 const countries = [
@@ -69,7 +70,7 @@ function CountryBillboardMarkers({ onHover, onClick, hovered }) {
 
 function Globe({ onHover, onClick, hovered }) {
   const globeRef = useRef();
-  const texture = useLoader(THREE.TextureLoader, '/assets/earth-blue-marble.jpg');
+  const texture = useLoader(THREE.TextureLoader, ASSETS.EARTH_TEXTURE);
 
   return (
     <group>

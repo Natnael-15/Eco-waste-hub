@@ -9,6 +9,7 @@ import { motion } from 'framer-motion';
 import { FaRecycle, FaLeaf, FaChartLine, FaTrophy, FaHistory, FaShoppingBag } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import Navbar from '../components/Navbar';
+import WelcomeModal from '../components/WelcomeModal';
 
 interface OrderItem {
   id: string;
@@ -37,17 +38,19 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ darkMode, toggleDarkMode 
   const navigate = useNavigate();
   const [showGoodbye, setShowGoodbye] = useState(false);
   const [stats] = useState({
-    recyclingPoints: 1250,
-    carbonSaved: 45.5,
-    itemsRecycled: 78,
-    streak: 12,
-    nextMilestone: 1500,
-    impactLevel: 'Eco Warrior'
+    recyclingPoints: 50,
+    carbonSaved: 0.5,
+    itemsRecycled: 2,
+    streak: 1,
+    nextMilestone: 250,
+    impactLevel: 'Eco Starter'
   });
   const [orders, setOrders] = useState<Order[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [showOrderModal, setShowOrderModal] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(false);
+  const [isNewUser, setIsNewUser] = useState(false);
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -73,6 +76,18 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ darkMode, toggleDarkMode 
 
     if (user) {
       fetchOrders();
+      // Show welcome modal on every login (per session)
+      if (!sessionStorage.getItem('welcomeShown')) {
+        setShowWelcome(true);
+        sessionStorage.setItem('welcomeShown', '1');
+      }
+      // Show special animation for new users (first login ever)
+      if (!localStorage.getItem('hasLoggedInBefore')) {
+        setIsNewUser(true);
+        localStorage.setItem('hasLoggedInBefore', '1');
+      } else {
+        setIsNewUser(false);
+      }
     }
   }, [user]);
 
@@ -86,15 +101,20 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ darkMode, toggleDarkMode 
       setShowGoodbye(true);
       await new Promise(resolve => setTimeout(resolve, 2000));
       await logout();
-      navigate('/login');
+      // Clear any remaining state
+      localStorage.removeItem('cart');
+      sessionStorage.clear();
+      // Force a hard reload to clear any remaining state
+      window.location.href = '/login';
     } catch (error) {
       console.error('Error during logout:', error);
       setShowGoodbye(false);
+      alert('Failed to log out. Please try again.');
     }
   };
 
   // Prefer profile.name, then email prefix, then Eco Hero
-  const displayName = profile?.name || user.email?.split('@')[0] || 'Eco Hero';
+  const displayName = profile?.name && profile.name.trim() !== '' ? profile.name : (user.email?.split('@')[0] || 'Eco Hero');
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-GB', {
@@ -108,6 +128,13 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ darkMode, toggleDarkMode 
 
   return (
     <>
+      <WelcomeModal
+        isOpen={showWelcome}
+        onClose={() => setShowWelcome(false)}
+        userEmail={user?.email || ''}
+        isNewUser={isNewUser}
+        displayName={displayName}
+      />
       <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
       <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-amber-50 to-emerald-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 transition-colors duration-300 py-16 px-4 pt-20">
         {/* Header Section */}
@@ -196,8 +223,8 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ darkMode, toggleDarkMode 
                   We run ads on the games to raise money for our mission—so every time you play, you help support Eco Waste Hub!
                 </p>
               </div>
-              <div className="flex items-center justify-center">
-                <Globe3D width={140} height={140} />
+              <div className="flex items-center justify-center min-w-[400px] min-h-[400px]">
+                <Globe3D width={400} height={400} />
               </div>
             </div>
           </motion.div>

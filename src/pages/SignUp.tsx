@@ -6,7 +6,7 @@ const SignUp: React.FC = () => {
   const [form, setForm] = useState({ name: '', email: '', password: '', confirm: '' });
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
-  const { signup } = useAuth();
+  const { signUp } = useAuth();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -15,19 +15,40 @@ const SignUp: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    
+    // Validate all fields are filled
     if (!form.name || !form.email || !form.password || !form.confirm) {
       setError('Please fill in all fields.');
       return;
     }
+
+    // Validate email format
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    const normalizedEmail = form.email.trim().toLowerCase();
+    
+    if (!emailRegex.test(normalizedEmail)) {
+      setError('Please enter a valid email address (e.g., user@example.com)');
+      return;
+    }
+
+    // Validate password match
     if (form.password !== form.confirm) {
       setError('Passwords do not match.');
       return;
     }
+
+    // Validate password length
+    if (form.password.length < 6) {
+      setError('Password must be at least 6 characters long.');
+      return;
+    }
+
     try {
-      await signup(form.name, form.email, form.password);
+      await signUp(normalizedEmail, form.password, form.name);
       setSubmitted(true);
     } catch (err: any) {
-      setError(err.message);
+      console.error('Signup error:', err);
+      setError(err.message || 'An error occurred during signup. Please try again.');
     }
   };
 

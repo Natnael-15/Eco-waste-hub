@@ -1,4 +1,5 @@
 import React from 'react';
+import { EXTERNAL_IMAGES } from '../constants/images';
 
 const posts = [
   {
@@ -6,7 +7,7 @@ const posts = [
     avatar: 'https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png',
     time: '3 hrs',
     text: 'We just delivered 200 meal kits to local families! Thank you for supporting our mission. 💚',
-    img: 'https://images.unsplash.com/photo-1519864600265-abb23847ef2c?auto=format&fit=crop&w=600&q=80',
+    img: EXTERNAL_IMAGES.UNSPLASH.FOOD_WASTE,
     likes: 120,
     comments: 18,
     shares: 7
@@ -16,7 +17,7 @@ const posts = [
     avatar: 'https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png',
     time: '1 day',
     text: 'Our volunteers rescued 500kg of fresh produce this week! #EcoWasteHub',
-    img: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80',
+    img: EXTERNAL_IMAGES.UNSPLASH.MOUNTAINS,
     likes: 98,
     comments: 12,
     shares: 4

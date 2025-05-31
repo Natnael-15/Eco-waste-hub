@@ -26,9 +26,9 @@ const partnerLogos = [
   'https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png',
 ];
 const recipes = [
-  { name: 'Veggie Stir Fry', img: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=400&q=80', desc: 'Use leftover veggies for a quick, healthy meal.', details: 'Ingredients: Mixed veggies, soy sauce, garlic, ginger.\nInstructions: Stir fry veggies in a hot pan with garlic and ginger, add soy sauce, cook until tender.' },
-  { name: 'Bread Pudding', img: 'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=400&q=80', desc: 'Turn stale bread into a delicious dessert.', details: 'Ingredients: Stale bread, milk, eggs, sugar, cinnamon.\nInstructions: Soak bread in milk, mix with eggs and sugar, bake until golden.' },
-  { name: 'Fruit Smoothie', img: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80', desc: 'Blend ripe fruits for a refreshing drink.', details: 'Ingredients: Ripe fruits, yogurt or juice, ice.\nInstructions: Blend all ingredients until smooth, serve chilled.' },
+  { name: 'Veggie Stir Fry', img: '/assets/stirfy vegi.jpg', desc: 'Use leftover veggies for a quick, healthy meal.', details: 'Ingredients: Mixed veggies, soy sauce, garlic, ginger.\nInstructions: Stir fry veggies in a hot pan with garlic and ginger, add soy sauce, cook until tender.' },
+  { name: 'Bread Pudding', img: '/assets/bread-pudding.jpg', desc: 'Turn stale bread into a delicious dessert.', details: 'Ingredients: Stale bread, milk, eggs, sugar, cinnamon.\nInstructions: Soak bread in milk, mix with eggs and sugar, bake until golden.' },
+  { name: 'Fruit Smoothie', img: '/assets/smoothie.jpg', desc: 'Blend ripe fruits for a refreshing drink.', details: 'Ingredients: Ripe fruits, yogurt or juice, ice.\nInstructions: Blend all ingredients until smooth, serve chilled.' },
 ];
 const faqs = [
   { q: 'What is food waste?', a: 'Food waste is food that is discarded or not eaten.' },
@@ -36,8 +36,8 @@ const faqs = [
   { q: 'How does Eco Waste Hub help?', a: 'We connect surplus food to people who need it.' },
 ];
 const testimonials = [
-  { name: 'Olivia R.', quote: 'Joining Eco Waste Hub was the best decision for our business and our community. We see the impact every day!', img: 'https://images.unsplash.com/photo-1519864600265-abb23847ef2c?auto=format&fit=crop&w=80&q=80' },
-  { name: 'James K.', quote: 'I love volunteering here. The team is amazing and the impact is real!', img: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=80&q=80' },
+  { name: 'Olivia R.', quote: 'Joining Eco Waste Hub was the best decision for our business and our community. We see the impact every day!', img: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=80&q=80' },
+  { name: 'James K.', quote: 'I love volunteering here. The team is amazing and the impact is real!', img: 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=80&q=80' },
 ];
 
 const About: React.FC = () => {
@@ -268,12 +268,12 @@ const About: React.FC = () => {
           <div className="max-w-4xl mx-auto flex flex-col md:flex-row gap-8 items-center justify-center">
             <div className="flex-1 flex flex-col gap-6">
               <div className="bg-eco-green/10 dark:bg-eco-yellow/10 rounded-xl p-6 shadow flex flex-col items-center">
-                <img src="https://images.unsplash.com/photo-1519864600265-abb23847ef2c?auto=format&fit=crop&w=80&q=80" alt="Olivia R." className="w-16 h-16 rounded-full mb-2" />
+                <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=80&q=80" alt="Olivia R." className="w-16 h-16 rounded-full mb-2" />
                 <div className="font-bold text-eco-green dark:text-eco-yellow">Olivia R.</div>
                 <div className="italic text-gray-700 dark:text-gray-200">"Joining Eco Waste Hub was the best decision for our business and our community. We see the impact every day!"</div>
               </div>
               <div className="bg-eco-green/10 dark:bg-eco-yellow/10 rounded-xl p-6 shadow flex flex-col items-center">
-                <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=80&q=80" alt="James K." className="w-16 h-16 rounded-full mb-2" />
+                <img src="https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=80&q=80" alt="James K." className="w-16 h-16 rounded-full mb-2" />
                 <div className="font-bold text-eco-green dark:text-eco-yellow">James K.</div>
                 <div className="italic text-gray-700 dark:text-gray-200">"I love volunteering here. The team is amazing and the impact is real!"</div>
               </div>
@@ -417,9 +417,9 @@ const About: React.FC = () => {
               </div>
               <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 overflow-hidden">
                 <motion.div initial={{ width: 0 }} animate={{ width: '64%' }} transition={{ duration: 1.2, delay: 0.5, ease: 'easeInOut' }} className="bg-eco-green dark:bg-eco-yellow h-4 rounded-full" />
-      </div>
-    </div>
-  </div>
+              </div>
+            </div>
+          </div>
         </section>
 
         {/* Eco Tips Rotator */}

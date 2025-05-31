@@ -1,38 +1,39 @@
 import React from 'react';
+import { EXTERNAL_IMAGES } from '../constants/images';
 
 const posts = [
   {
-    img: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80',
+    img: EXTERNAL_IMAGES.UNSPLASH.FOOD_WASTE,
     caption: 'Turning surplus into smiles! #EcoWasteHub #FoodRescue',
     likes: 324,
     comments: 12
   },
   {
-    img: 'https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80',
+    img: EXTERNAL_IMAGES.UNSPLASH.MOUNTAINS,
     caption: 'Fresh produce, fresh start. Join the movement! 🌱',
     likes: 287,
     comments: 8
   },
   {
-    img: 'https://images.unsplash.com/photo-1519864600265-abb23847ef2c?auto=format&fit=crop&w=600&q=80',
+    img: EXTERNAL_IMAGES.UNSPLASH.FOOD_PREP,
     caption: 'Every meal rescued is a win for the planet. 🌍',
     likes: 412,
     comments: 19
   },
   {
-    img: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=80',
+    img: EXTERNAL_IMAGES.UNSPLASH.FOOD_SERVE,
     caption: 'Volunteers making a difference every day! #EcoHeroes',
     likes: 198,
     comments: 5
   },
   {
-    img: 'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=600&q=80',
+    img: EXTERNAL_IMAGES.UNSPLASH.FOOD_DISPLAY,
     caption: 'Sustainable groceries for all. Shop with purpose.',
     likes: 256,
     comments: 7
   },
   {
-    img: 'https://images.unsplash.com/photo-1506089676908-3592f7389d4d?auto=format&fit=crop&w=600&q=80',
+    img: EXTERNAL_IMAGES.UNSPLASH.FOOD_PREPARATION,
     caption: 'Together, we reduce waste and feed communities.',
     likes: 301,
     comments: 10

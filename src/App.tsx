@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
+import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { ThemeProvider, useTheme } from './context/ThemeContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
 import Shop from './pages/Shop';
-import HowItWorks from './pages/HowItWorks';
+import About from './pages/About';
 import Donate from './pages/Donate';
 import FoodDeals from './pages/FoodDeals';
 import Contact from './pages/Contact';
@@ -16,7 +16,6 @@ import Login from './pages/Login';
 import BecomePartner from './pages/BecomePartner';
 import SignUp from './pages/SignUp';
 import Checkout from './pages/Checkout';
-import About from './pages/About';
 import FAQ from './pages/FAQ';
 import Terms from './pages/Terms';
 import Policy from './pages/Policy';
@@ -33,8 +32,10 @@ import GameArcade from './pages/GameArcade';
 import AdminUsers from './pages/AdminUsers';
 import AdminSettings from './pages/AdminSettings';
 import AdminAdRevenue from './pages/AdminAdRevenue';
+import WishList from './pages/WishList';
 import './App.css';
 import { supabase } from './lib/supabase';
+import { AdminThemeProvider } from './context/AdminThemeContext';
 
 const BackButton: React.FC = () => {
   const navigate = useNavigate();
@@ -49,10 +50,34 @@ const BackButton: React.FC = () => {
   );
 };
 
+// Admin route protection component
+const AdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user, isAdmin, loading } = useAuth();
+  const location = useLocation();
+
+  // Allow hardcoded admin session
+  const isHardcodedAdmin = typeof window !== 'undefined' && sessionStorage.getItem('isHardcodedAdmin') === 'true';
+
+  // Prevent redirect loop: never protect /admin-login
+  if (location.pathname === '/admin-login') {
+    return <>{children}</>;
+  }
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if ((!user || !isAdmin) && !isHardcodedAdmin) {
+    return <Navigate to="/admin-login" state={{ from: location }} replace />;
+  }
+
+  return <>{children}</>;
+};
+
 const AppRoutes: React.FC<{ darkMode: boolean, toggleDarkMode: () => void }> = ({ darkMode, toggleDarkMode }) => {
   const location = useLocation();
   const hideNavAndFooter = location.pathname === '/login' || location.pathname === '/signup';
-  const isAdminRoute = location.pathname.startsWith('/admin');
+  const isAdminRoute = location.pathname.startsWith('/admin') && location.pathname !== '/admin-login';
   const isGameArcade = location.pathname === '/game-arcade';
   return (
     <div className="flex flex-col min-h-screen">
@@ -60,19 +85,23 @@ const AppRoutes: React.FC<{ darkMode: boolean, toggleDarkMode: () => void }> = (
       {isGameArcade && <BackButton />}
       <main className="flex-grow">
         {isAdminRoute ? (
-          <Routes>
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/admin/orders" element={<AdminOrders />} />
-            <Route path="/admin/donations" element={<AdminDonations />} />
-            <Route path="/admin/users" element={<AdminUsers />} />
-            <Route path="/admin/settings" element={<AdminSettings />} />
-            <Route path="/admin/ad-revenue" element={<AdminAdRevenue />} />
-          </Routes>
+          <AdminThemeProvider>
+            <AdminRoute>
+              <Routes>
+                <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/admin/orders" element={<AdminOrders />} />
+                <Route path="/admin/donations" element={<AdminDonations />} />
+                <Route path="/admin/users" element={<AdminUsers />} />
+                <Route path="/admin/settings" element={<AdminSettings />} />
+                <Route path="/admin/ad-revenue" element={<AdminAdRevenue />} />
+              </Routes>
+            </AdminRoute>
+          </AdminThemeProvider>
         ) : (
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/shop" element={<Shop />} />
-            <Route path="/how-it-works" element={<HowItWorks />} />
+            <Route path="/how-it-works" element={<About />} />
             <Route path="/donate" element={<Donate />} />
             <Route path="/food-deals" element={<FoodDeals />} />
             <Route path="/contact" element={<Contact />} />
@@ -91,6 +120,7 @@ const AppRoutes: React.FC<{ darkMode: boolean, toggleDarkMode: () => void }> = (
             <Route path="/game-arcade" element={<GameArcade />} />
             <Route path="/dashboard" element={<UserDashboard darkMode={darkMode} toggleDarkMode={toggleDarkMode} />} />
             <Route path="/account" element={<Account darkMode={darkMode} toggleDarkMode={toggleDarkMode} />} />
+            <Route path="/wishlist" element={<WishList />} />
             <Route path="/admin-login" element={<AdminLogin />} />
             <Route path="*" element={
               <div className="flex items-center justify-center min-h-[60vh]">
@@ -114,11 +144,7 @@ const AppRoutes: React.FC<{ darkMode: boolean, toggleDarkMode: () => void }> = (
 const AppContent: React.FC = () => {
   const { darkMode, toggleDarkMode } = useTheme();
   return (
-    <>
-      <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
-      <AppRoutes darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
-      <Footer darkMode={darkMode} />
-    </>
+    <AppRoutes darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
   );
 };
 

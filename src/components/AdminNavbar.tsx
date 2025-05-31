@@ -31,6 +31,7 @@ const AdminNavbar: React.FC = () => {
     } catch (error) {
       console.error('Error logging out:', error);
       setShowGoodbye(false);
+      alert('Failed to log out. Please try again.');
     }
   };
 
@@ -130,7 +131,7 @@ const AdminNavbar: React.FC = () => {
           </div>
         </div>
       </header>
-      <GoodbyeModal show={showGoodbye} />
+      <GoodbyeModal isOpen={showGoodbye} userEmail={user?.email || ''} />
     </>
   );
 };

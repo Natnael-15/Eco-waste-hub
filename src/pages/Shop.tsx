@@ -129,6 +129,17 @@ const Shop: React.FC<ShopProps> = ({ darkMode, toggleDarkMode }) => {
       });
   }, []);
 
+  // Load wishlist from localStorage on mount
+  useEffect(() => {
+    const saved = JSON.parse(localStorage.getItem('wishlist') || '[]');
+    setWishlist(saved);
+  }, []);
+
+  // Sync wishlist to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('wishlist', JSON.stringify(wishlist));
+  }, [wishlist]);
+
   console.log('selectedCategory:', selectedCategory);
   console.log('selectedTag:', selectedTag);
   console.log('search:', search);
@@ -145,9 +156,19 @@ const Shop: React.FC<ShopProps> = ({ darkMode, toggleDarkMode }) => {
   };
 
   const handleWishlist = (product) => {
-    setWishlist(prev => prev.some(p => p.id === product.id) ? prev.filter(p => p.id !== product.id) : [...prev, product]);
-    setToast({ type: 'wishlist', message: wishlist.some(p => p.id === product.id) ? `${product.name} removed from wishlist` : `${product.name} added to wishlist!` });
-    setTimeout(() => setToast(null), 2000);
+    setWishlist(prev => {
+      const exists = prev.some(p => p.id === product.id);
+      let updated;
+      if (exists) {
+        updated = prev.filter(p => p.id !== product.id);
+        setToast({ type: 'wishlist', message: `${product.name} removed from wishlist` });
+      } else {
+        updated = [...prev, product];
+        setToast({ type: 'wishlist', message: `${product.name} added to wishlist!` });
+      }
+      setTimeout(() => setToast(null), 2000);
+      return updated;
+    });
   };
 
   // Brand modal custom styles

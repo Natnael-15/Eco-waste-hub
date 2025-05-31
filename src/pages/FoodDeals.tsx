@@ -77,6 +77,15 @@ const FoodDeals: React.FC<FoodDealsProps> = ({ darkMode, toggleDarkMode }) => {
       });
   }, []);
 
+  useEffect(() => {
+    const saved = JSON.parse(localStorage.getItem('wishlist') || '[]');
+    setWishlist(saved);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('wishlist', JSON.stringify(wishlist));
+  }, [wishlist]);
+
   const filteredDeals = deals.filter(deal => {
     return (
       (!selectedCategory || deal.category === selectedCategory) &&
@@ -102,9 +111,19 @@ const FoodDeals: React.FC<FoodDealsProps> = ({ darkMode, toggleDarkMode }) => {
       navigate('/login');
       return;
     }
-    setWishlist(prev => prev.some(p => p.id === deal.id) ? prev.filter(p => p.id !== deal.id) : [...prev, deal]);
-    setToast({ type: 'wishlist', message: wishlist.some(p => p.id === deal.id) ? `${deal.name} removed from wishlist` : `${deal.name} added to wishlist!` });
-    setTimeout(() => setToast(null), 2000);
+    setWishlist(prev => {
+      const exists = prev.some(p => p.id === deal.id);
+      let updated;
+      if (exists) {
+        updated = prev.filter(p => p.id !== deal.id);
+        setToast({ type: 'wishlist', message: `${deal.name} removed from wishlist` });
+      } else {
+        updated = [...prev, deal];
+        setToast({ type: 'wishlist', message: `${deal.name} added to wishlist!` });
+      }
+      setTimeout(() => setToast(null), 2000);
+      return updated;
+    });
   };
 
   // Calculate cart summary

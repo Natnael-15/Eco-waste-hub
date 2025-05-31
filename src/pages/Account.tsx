@@ -134,10 +134,15 @@ const Account: React.FC<AccountProps> = ({ darkMode, toggleDarkMode }) => {
       setShowGoodbye(true);
       await new Promise(resolve => setTimeout(resolve, 2000));
       await logout();
-      navigate('/login', { replace: true });
+      // Clear any remaining state
+      localStorage.removeItem('cart');
+      sessionStorage.clear();
+      // Force a hard reload to clear any remaining state
+      window.location.href = '/login';
     } catch (error) {
       console.error('Error logging out:', error);
       setShowGoodbye(false);
+      alert('Failed to log out. Please try again.');
     } finally {
       setIsLoading(false);
     }

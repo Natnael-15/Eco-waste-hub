@@ -3,44 +3,44 @@ import { Link } from 'react-router-dom';
 import { FaLeaf, FaAppleAlt, FaCarrot, FaHandHoldingHeart } from 'react-icons/fa';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import userIcon from '/assets/user-icon.svg';
+import { ASSETS } from '../constants/images';
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
 import Navbar from '../components/Navbar';
 
 const socialProof = [
-  { name: 'Sarah', type: 'Volunteer', img: userIcon },
-  { name: 'Green Bakery', type: 'Partner', img: '/assets/gallery2-thumb.jpeg' },
-  { name: 'Hope Shelter', type: 'Charity', img: '/assets/gallery3-thumb.jpeg' },
-  { name: 'James', type: 'Volunteer', img: userIcon },
-  { name: 'Fresh Farms', type: 'Partner', img: '/assets/gallery1-thumb.jpeg' },
+  { name: 'Sarah', type: 'Volunteer', img: ASSETS.USER_ICON },
+  { name: 'Green Bakery', type: 'Partner', img: ASSETS.GALLERY.IMAGE2_THUMB },
+  { name: 'Hope Shelter', type: 'Charity', img: ASSETS.GALLERY.IMAGE3_THUMB },
+  { name: 'James', type: 'Volunteer', img: ASSETS.USER_ICON },
+  { name: 'Fresh Farms', type: 'Partner', img: ASSETS.GALLERY.IMAGE1_THUMB },
 ];
 
 const featuredProducts = [
   {
     name: 'Organic Veg Box',
     price: 15.99,
-    image: '/assets/deal1.jpg',
+    image: ASSETS.DEALS.DEAL1,
     desc: 'Fresh, rescued organic vegetables.'
   },
   {
     name: 'Bakery Bundle',
     price: 8.99,
-    image: '/assets/deal2.jpg',
+    image: ASSETS.DEALS.DEAL2,
     desc: 'Assorted bread and pastries.'
   },
   {
     name: 'Fruit Rescue',
     price: 12.99,
-    image: '/assets/deal3.jpg',
+    image: ASSETS.DEALS.DEAL3,
     desc: 'Seasonal fruits, perfectly ripe.'
   }
 ];
 
 const galleryImages = [
-  { src: '/assets/gallery1.jpeg', thumb: '/assets/gallery1-thumb.jpeg', alt: 'Community event 1' },
-  { src: '/assets/gallery2.jpeg', thumb: '/assets/gallery2-thumb.jpeg', alt: 'Community event 2' },
-  { src: '/assets/gallery3.jpeg', thumb: '/assets/gallery3-thumb.jpeg', alt: 'Community event 3' },
+  { src: ASSETS.GALLERY.IMAGE1, thumb: ASSETS.GALLERY.IMAGE1_THUMB, alt: 'Community event 1' },
+  { src: ASSETS.GALLERY.IMAGE2, thumb: ASSETS.GALLERY.IMAGE2_THUMB, alt: 'Community event 2' },
+  { src: ASSETS.GALLERY.IMAGE3, thumb: ASSETS.GALLERY.IMAGE3_THUMB, alt: 'Community event 3' },
 ];
 
 const steps = [
@@ -78,19 +78,19 @@ const testimonials = [
     quote: '“Joining Eco Waste Hub was the best decision for our business and our community. We see the impact every day!”',
     name: 'Olivia R.',
     role: 'Local Partner',
-    image: '/assets/gallery2-thumb.jpeg',
+    image: ASSETS.GALLERY.IMAGE2_THUMB,
   },
   {
     quote: '“I love volunteering here. The team is amazing and the impact is real!”',
     name: 'James K.',
     role: 'Volunteer',
-    image: '/assets/gallery1-thumb.jpeg',
+    image: ASSETS.GALLERY.IMAGE1_THUMB,
   },
   {
     quote: "“We've received fresh food for our center thanks to this initiative.”",
     name: 'Helen T.',
     role: 'Community Center',
-    image: '/assets/gallery3-thumb.jpeg',
+    image: ASSETS.GALLERY.IMAGE3_THUMB,
   },
 ];
 
@@ -210,19 +210,19 @@ const spotlights = [
   {
     name: 'Sarah M.',
     role: 'Volunteer',
-    image: '/assets/gallery1-thumb.jpeg',
+    image: ASSETS.GALLERY.IMAGE1_THUMB,
     quote: '“Volunteering here has been so rewarding. I love seeing the smiles we bring!”',
   },
   {
     name: 'Green Bakery',
     role: 'Partner',
-    image: '/assets/gallery2-thumb.jpeg',
+    image: ASSETS.GALLERY.IMAGE2_THUMB,
     quote: "“We're proud to donate our surplus and help the community.”",
   },
   {
     name: 'Hope Shelter',
     role: 'Charity Partner',
-    image: '/assets/gallery3-thumb.jpeg',
+    image: ASSETS.GALLERY.IMAGE3_THUMB,
     quote: '“The fresh food we receive makes a real difference for our guests.”',
   },
 ];
@@ -493,7 +493,6 @@ const Home: React.FC<HomeProps> = ({ darkMode, toggleDarkMode }) => {
                 <div className="text-gray-600 dark:text-gray-200 mb-2">{prod.desc}</div>
                 <div className="text-lg font-bold text-eco-yellow mb-3">£{prod.price.toFixed(2)}</div>
                 <div className="flex gap-2">
-                  <button className="bg-eco-green dark:bg-eco-yellow text-white dark:text-eco-green px-5 py-2 rounded-full font-semibold hover:bg-eco-green/80 dark:hover:bg-yellow-300 transition">Add to Cart</button>
                   <Link to="/shop" className="bg-white dark:bg-gray-900 border border-eco-green text-eco-green dark:text-eco-yellow px-4 py-2 rounded-full font-semibold hover:bg-eco-green hover:text-white dark:hover:bg-eco-yellow dark:hover:text-eco-green transition">View Details</Link>
                 </div>
               </div>
