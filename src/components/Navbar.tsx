@@ -19,6 +19,11 @@ const Navbar: React.FC = () => {
     return null;
   }
 
+  // Hide Navbar on replica social media pages
+  if (["/instagram", "/facebook", "/twitter"].includes(location.pathname)) {
+    return null;
+  }
+
   const handleSignOut = async () => {
     try {
       setShowGoodbye(true);
